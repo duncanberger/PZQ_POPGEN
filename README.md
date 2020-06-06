@@ -65,7 +65,6 @@ parallel --dry-run --colsep '\t' "bwa mem -t 6 Sm_v7_nohap.fa {8}_1.fastq.gz {8}
 The parallel command will write each mapping command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. 
 ```
 # For example:
-
 bwa mem -t 6 Sm_v7_nohap.fa ERR3173238_1.fastq.gz ERR3173238_2.fastq.gz | samtools sort -@6 -o PZQ_popgen6472766.bam -
 ```
 
@@ -78,6 +77,8 @@ The parallel command will write each markduplicate command to screen, which can 
 # For example:
 gatk MarkDuplicates --INPUT PZQ_popgen6472766.bam --OUTPUT PZQ_popgen6472766.markdup.bam --METRICS_FILE PZQ_popgen6472766.metrics.txt
 ```
+
+
 
 
 
