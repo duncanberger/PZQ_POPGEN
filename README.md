@@ -113,12 +113,12 @@ gatk GenotypeGVCFs --reference ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --var
 ```
 
 ## 04 - Quality control <a name="setup"></a>
-### Separate and filter SNPs, Indels and mixed sites
+### Separate and filter SNPs
 ```
 # Select SNPs
 gatk SelectVariants -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant merged_all_samples.vcf --select-type-to-include SNP --output merged_all_samples.SNPs.vcf
 
-# Filter SNPs
+# Tag low-quality SNPs
 gatk VariantFiltration \
 --filter-expression "ReadPosRankSum < -8.0" --filter-name "RPRS8" \
 --filter-expression "QD < 2.0" --filter-name "QD2" \
@@ -130,15 +130,15 @@ gatk VariantFiltration \
 -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa  \
 --output merged_all_samples.SNPs.tagged.vcf
 
-
-# Separate Indels and mixed sites (sites containing SNPs and Indels)
-
+# Remove low-quality sites
+gatk SelectVariants -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant merged_all_samples.SNPs.tagged.vcf --exclude-filtered --output merged_all_samples.SNPs.filtered.vcf
 ```
+### Separate and filter indels and mixed sites
 ```
-# Select Indels and mixed sites
+# Select indels and mixed sites
 gatk SelectVariants -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant merged_all_samples.vcf --select-type-to-include SNP --output merged_all_samples.indels_mixed.vcf
 
-# Filter Indels and mixed sites
+# Tag low-quality indels and mixed sites
 /lustre/scratch118/infgen/team133/db22/software/gatk-4.1.0.0/gatk VariantFiltration \
 --filter-expression "QD < 2.0" --filter-name "QD2" \
 --filter-expression "FS > 200.0" --filter-name "FS200" \
@@ -147,7 +147,45 @@ gatk SelectVariants -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant mer
 --variant merged_all_samples.indels_mixed.vcf \
 -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa  \
 --output merged_all_samples.indels_mixed.tagged.vcf
+
+# Remove low-quality sites
+gatk SelectVariants -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant merged_all_samples.indels_mixed.tagged.vcf --exclude-filtered --output merged_all_samples.indels_mixed.filtered.vcf
 ```
+
+### Recombine filtered variants
+```
+gatk MergeVcfs --INPUT merged_all_samples.SNPs.filtered.vcf --INPUT merged_all_samples.indels_mixed.filtered.vcf --OUTPUT merged_all_samples.filtered.vcf
+```
+
+### 
+```
+# Calculate per-individual missingness rate 
+vcftools --vcf merged_all_samples.filtered.vcf.FL1.vcf --missing-indv --out missing_indv
+
+# Filter out individuals with high rates of missing variant calls
+awk '$6<0.55' missing_site.imiss | grep -v "MISS" | cut -f1  > retain.samples.list
+vcftools --vcf merged_all_samples.filtered.vcf.FL1.vcf --keep retain.samples.list --recode-INFO-all --recode --out merged_all_samples.filtered.vcf.FL1.vcf  
+
+# Calculate per-site missingness rate 
+vcftools --vcf merged_all_samples.filtered.vcf --missing-site --out missing_site
+
+# Filter out site with high rates of missing variant calls
+awk '$6<0.1' missing_site.lmiss | grep -v "MISS" | cut -f1,2 > retain.variants.list
+vcftools --vcf merged_all_samples.filtered.vcf.FL1.vcf --postions retain.variants.list --recode-INFO-all --recode --out merged_all_samples.filtered.vcf.FL2.vcf 
+
+# Calculate inbreeding coefficient
+vcftools --vcf merged_all_samples.filtered.vcf.FL2.vcf --het --out ib
+
+# Remove sites with excessively low inbreeding coefficient
+awk '$5<-0.3' ib.het | grep -v "INDV" | cut -f1 > retain.IB.samples.list
+vcftools --vcf merged_all_samples.filtered.vcf.FL2.vcf --keep retain.IB.samples.list --recode-INFO-all --recode --out merged_all_samples.filtered.vcf.FL3.vcf
+
+# Remove sites with low minor allele frequency and exclude all variants not on chromosomes 1-7 or Z. 
+vcftools --vcf merged_all_samples.filtered.vcf.FL3.vcf --recode --recode-INFO-all --maf 0.01 --out merged_all_samples.filtered.vcf.FL4.vcf
+
+```
+
+
 
 
 
