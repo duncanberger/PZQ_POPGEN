@@ -28,6 +28,10 @@ Get the reference genomes for mapping
 ```
 cd 01_REFERENCES
 
-# s_mansoni
+# *S. mansoni reference genome*
 wget ftp://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS14/species/schistosoma_mansoni/PRJEA36577/schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa.gz
 
+# unzip
+gunzip schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa.gz
+
+# Select 
