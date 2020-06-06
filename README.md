@@ -74,20 +74,27 @@ parallel --dry-run --colsep '\t' "gatk MarkDuplicates --INPUT {1}.bam --OUTPUT {
 The parallel command will write each markduplicate command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. For example:
 ```
 gatk MarkDuplicates --INPUT PZQ_popgen6472766.bam --OUTPUT PZQ_popgen6472766.markdup.bam --METRICS_FILE PZQ_popgen6472766.metrics.txt
+
+# Index all BAM files
+parallel -j1 --colsep '\t' "samtools index {1}" <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+
 ```
 
 ### Per-sampling variant calling
 ```
-# Index all BAM files
-parallel -j1 --colsep '\t' "samtools index {1}" <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
-
 cd ${WORKING_DIR}/04_VCALLING
+
 # Variant call each sample
 parallel --dry-run "gatk HaplotypeCaller --emit-ref-confidence GVCF -I ${WORKING_DIR}/03_MAPPING/{1}.remarkdup.bam -R Sm_v7_nohap.fa -O {1}.g.vcf" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 
 ```
+For example:
+```
+samtools index PZQ_popgen6472766
+
+gatk HaplotypeCaller --emit-ref-confidence GVCF -I /lustre/scratch118/infgen/team133/db22/crellen_remap/run_through/03_MAPPING/PZQ_popgen6472766.remarkdup.bam -R Sm_v7_nohap.fa -O PZQ_popgen6472766.g.vcf
+
+```
 
 
-
-
-
+ 
