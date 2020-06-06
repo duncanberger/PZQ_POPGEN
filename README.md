@@ -79,6 +79,7 @@ gatk MarkDuplicates --INPUT PZQ_popgen6472766.bam --OUTPUT PZQ_popgen6472766.mar
 parallel -j1 --colsep '\t' "samtools index {1}" <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 
 ```
+## 03 - Variant calling <a name="setup"></a>
 
 ### Per-sampling variant calling
 ```
@@ -110,6 +111,8 @@ gatk CombineGVCFs --arguments_file argument.list --reference ${WORKING_DIR}/01_R
 gatk GenotypeGVCFs --reference ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant merged_all_samples.g.vcf --output merged_all_samples.vcf
 
 ```
+
+## 04 - Quality control <a name="setup"></a>
 ### Separate and filter SNPs, Indels and mixed sites
 ```
 # Select SNPs
