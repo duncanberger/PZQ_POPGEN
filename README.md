@@ -24,7 +24,7 @@ mkdir 00_METADATA 01_REFERENCES 02_RAWDATA 03_MAPPING 04_VCALLING 05_QC 06_ANALY
 ```
 
 ### Reference genomes
-Get the reference genomes for mapping
+Download the reference genomes
 ```
 cd 01_REFERENCES
 
@@ -37,5 +37,16 @@ gunzip schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa.gz
 # Exclude haplotype scaffolds and trim scaffold names
 seqtk subseq schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa <(grep "Retained" ../00_METADATA/supplementary_table_3.txt | cut -f1 | cat) | cut -f1 -d " " > Sm_v7_nohap.fa
 ```
-### Sample and lane list
 
+### Sample metadata
+
+## 02 - Mapping <a name="setup"></a>
+### Download and map raw reads to the reference genome
+```
+# Make a list of FASTQ files to download
+cut -f13 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep gz | tr ';' '\t' > fastq.list
+
+# Download FASTQ files
+parallel -j4 --colsep '\t' "wget {1} {2}" :::: fastq.list
+
+```
