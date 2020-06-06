@@ -185,3 +185,7 @@ vcftools --vcf merged_all_samples.filtered.vcf.FL3.vcf --recode --recode-INFO-al
 
 ```
 ### Functionally annotate variant calls
+```
+# Using an existing SnpEFF database 
+java -jar snpEff.jar Sm_v7.2 merged_all_samples.filtered.vcf.FL4.vcf > merged_all_samples.filtered.vcf.FL4.SNPEFF.vcf
+```
