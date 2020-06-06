@@ -23,8 +23,8 @@ WORKING_DIR=${PWD}
 mkdir 00_METADATA 01_REFERENCES 02_RAWDATA 03_MAPPING 04_VCALLING 05_QC 06_ANALYSIS
 ```
 
-### Reference genomes
-Download the reference genomes
+### Reference genome
+Download the reference genome
 ```
 cd 01_REFERENCES
 
@@ -52,7 +52,6 @@ gatk CreateSequenceDictionary --REFERENCE Sm_v7_nohap.fa
 ```
 # Download FASTQ files in parallel
 parallel -j4 --colsep '\t' "wget {1} {2}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.tx| cut -f13 | grep 'gz' | tr ';' '\t')
-
 ```
 
 ### Map sequence reads to reference genome
@@ -77,7 +76,6 @@ gatk MarkDuplicates --INPUT PZQ_popgen6472766.bam --OUTPUT PZQ_popgen6472766.mar
 
 # Index all BAM files
 parallel -j1 --colsep '\t' "samtools index {1}" <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
-
 ```
 ## 03 - Variant calling <a name="setup"></a>
 
@@ -109,7 +107,6 @@ gatk CombineGVCFs --arguments_file argument.list --reference ${WORKING_DIR}/01_R
 
 # Genotype
 gatk GenotypeGVCFs --reference ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant merged_all_samples.g.vcf --output merged_all_samples.vcf
-
 ```
 
 ## 04 - Quality control <a name="setup"></a>
@@ -182,7 +179,6 @@ vcftools --vcf merged_all_samples.filtered.vcf.FL2.vcf --keep retain.IB.samples.
 
 # Remove sites with low minor allele frequency and exclude all variants not on chromosomes 1-7 or Z. 
 vcftools --vcf merged_all_samples.filtered.vcf.FL3.vcf --recode --recode-INFO-all --maf 0.01 --out merged_all_samples.filtered.vcf.FL4.vcf
-
 ```
 ### Functionally annotate variant calls
 ```
@@ -196,4 +192,3 @@ mkdir ${WORKING_DIR}/06_ANALYSIS/FREEZE
 mv merged_all_samples.filtered.vcf.FL4.SNPEFF.vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.snpeff.vcf
 mv merged_all_samples.filtered.vcf.FL4.vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf
 ```
-
