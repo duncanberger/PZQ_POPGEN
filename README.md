@@ -36,6 +36,13 @@ gunzip schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa.gz
 
 # Exclude haplotype scaffolds and trim scaffold names
 seqtk subseq schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa <(grep "Retained" ../00_METADATA/supplementary_table_3.txt | cut -f1 | cat) | cut -f1 -d " " > Sm_v7_nohap.fa
+
+# Create indexes for the reference genome
+bwa index Sm_v7_nohap.fa
+
+samtools faidx Sm_v7_nohap.fa
+
+gatk CreateSequenceDictionary --REFERENCE Sm_v7_nohap.fa
 ```
 
 ### Sample metadata
@@ -44,5 +51,7 @@ seqtk subseq schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa <(grep "Retained" 
 ### Download and map raw reads to the reference genome
 ```
 # Download FASTQ files in parallel
-parallel -j4  --colsep '\t' "wget {1} {2}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.tx| cut -f13 | grep "gz" | tr ';' '\t')
+parallel -j4 --colsep '\t' "wget {1} {2}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.tx| cut -f13 | grep "gz" | tr ';' '\t')
+
+# 
 ```
