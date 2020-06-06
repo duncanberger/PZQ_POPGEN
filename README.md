@@ -20,7 +20,7 @@ cd ${HOME}/PZQ_POPGEN
 WORKING_DIR=${PWD}
 
 # make working directories
-mkdir 00_SCRIPTS 01_REFERENCES 02_RAWDATA 03_MAPPING 04_VCALLING 05_QC 06_ANALYSIS
+mkdir 00_METADATA 01_REFERENCES 02_RAWDATA 03_MAPPING 04_VCALLING 05_QC 06_ANALYSIS
 ```
 
 ### Reference genomes
@@ -28,10 +28,14 @@ Get the reference genomes for mapping
 ```
 cd 01_REFERENCES
 
-# *S. mansoni reference genome*
+# Download the S. mansoni reference genome
 wget ftp://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS14/species/schistosoma_mansoni/PRJEA36577/schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa.gz
 
-# unzip
+# Unzip
 gunzip schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa.gz
 
-# Select 
+# Exclude haplotype scaffolds and trim scaffold names
+seqtk subseq schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa <(grep "Retained" ../00_METADATA/supplementary_table_3.txt | cut -f1 | cat) | cut -f1 -d " " > Sm_v7_nohap.fa
+```
+### Sample and lane list
+
