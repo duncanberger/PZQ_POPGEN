@@ -44,5 +44,5 @@ seqtk subseq schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa <(grep "Retained" 
 ### Download and map raw reads to the reference genome
 ```
 # Download FASTQ files in parallel
-parallel -j4  --colsep '\t' "wget {1} {2}" :::: <( cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.tx| cut -f13 | grep "gz" | tr ';' '\t')
+parallel -j4  --colsep '\t' "wget {1} {2}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.tx| cut -f13 | grep "gz" | tr ';' '\t')
 ```
