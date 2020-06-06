@@ -64,7 +64,7 @@ parallel --dry-run --colsep '\t' "bwa mem -t 6 Sm_v7_nohap.fa {8}_1.fastq.gz {8}
 
 The parallel command will write each mapping command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. For example:
 ```
-bwa mem -t 6 Sm_v7_nohap.fa ERR3173238_1.fastq.gz ERR3173238_2.fastq.gz | samtools sort -@6 -o PZQ_popgen6472766.bam -
+bwa mem -t 6 ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa ERR3173238_1.fastq.gz ERR3173238_2.fastq.gz | samtools sort -@6 -o PZQ_popgen6472766.bam -
 ```
 
 ### Mark PCR duplicates
@@ -85,14 +85,29 @@ parallel -j1 --colsep '\t' "samtools index {1}" <(cat ${WORKING_DIR}/00_METADATA
 cd ${WORKING_DIR}/04_VCALLING
 
 # Variant call each sample
-parallel --dry-run "gatk HaplotypeCaller --emit-ref-confidence GVCF -I ${WORKING_DIR}/03_MAPPING/{1}.remarkdup.bam -R Sm_v7_nohap.fa -O {1}.g.vcf" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
-
+parallel --dry-run "gatk HaplotypeCaller --emit-ref-confidence GVCF -I ${WORKING_DIR}/03_MAPPING/{1}.remarkdup.bam -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa -O {1}.g.vcf" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 ```
 For example:
 ```
 samtools index PZQ_popgen6472766
 
-gatk HaplotypeCaller --emit-ref-confidence GVCF -I /lustre/scratch118/infgen/team133/db22/crellen_remap/run_through/03_MAPPING/PZQ_popgen6472766.remarkdup.bam -R Sm_v7_nohap.fa -O PZQ_popgen6472766.g.vcf
+gatk HaplotypeCaller --emit-ref-confidence GVCF -I /lustre/scratch118/infgen/team133/db22/crellen_remap/run_through/03_MAPPING/PZQ_popgen6472766.remarkdup.bam -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa -O PZQ_popgen6472766.g.vcf
+```
+
+# Rename samples in each gVCF
+```
+parallel --dry-run --colsep '\t' "gatk RenameSampleInVcf --INPUT {1}.g.vcf --OUTPUT {1}.renamed.g.vcf --NEW_SAMPLE_NAME {1}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+```
+# Combine all samples into a single gVCF
+```
+# Create and list of arguments for input into CombineGVCFs
+parallel -j1 --colsep '\t' "echo '--INPUT {1}.renamed.g.vcf'" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz") > argument.list
+
+# Combine gVCFs
+gatk CombineGVCFs --arguments_file argument.list --reference ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --output merged_all_samples.g.vcf
+
+# Genotype
+gatk GenotypeGVCFs --reference ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant merged_all_samples.g.vcf --output merged_all_samples.vcf
 
 ```
 
