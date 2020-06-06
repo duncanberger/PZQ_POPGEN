@@ -157,7 +157,7 @@ gatk SelectVariants -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant mer
 gatk MergeVcfs --INPUT merged_all_samples.SNPs.filtered.vcf --INPUT merged_all_samples.indels_mixed.filtered.vcf --OUTPUT merged_all_samples.filtered.vcf
 ```
 
-### 
+### Remove low-quality samples and variants 
 ```
 # Calculate per-individual missingness rate 
 vcftools --vcf merged_all_samples.filtered.vcf.FL1.vcf --missing-indv --out missing_indv
@@ -169,7 +169,7 @@ vcftools --vcf merged_all_samples.filtered.vcf.FL1.vcf --keep retain.samples.lis
 # Calculate per-site missingness rate 
 vcftools --vcf merged_all_samples.filtered.vcf --missing-site --out missing_site
 
-# Filter out site with high rates of missing variant calls
+# Filter out sites with high rates of missing variant calls
 awk '$6<0.1' missing_site.lmiss | grep -v "MISS" | cut -f1,2 > retain.variants.list
 vcftools --vcf merged_all_samples.filtered.vcf.FL1.vcf --postions retain.variants.list --recode-INFO-all --recode --out merged_all_samples.filtered.vcf.FL2.vcf 
 
