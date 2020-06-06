@@ -59,25 +59,33 @@ parallel -j4 --colsep '\t' "wget {1} {2}" :::: <(cat ${WORKING_DIR}/00_METADATA/
 ```
 cd ${WORKING_DIR}/03_MAPPING
 
-parallel --dry-run --colsep '\t' "bwa mem -t 6 Sm_v7_nohap.fa {8}_1.fastq.gz {8}_2.fastq.gz | samtools sort -@6  {1}.bam -" :::: <(cat ../00_METADATA/supplementary_table_2.txt | grep "gz")
+parallel --dry-run --colsep '\t' "bwa mem -t 6 Sm_v7_nohap.fa {8}_1.fastq.gz {8}_2.fastq.gz | samtools sort -@6  {1}.bam -" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 ```
 
-The parallel command will write each mapping command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. 
+The parallel command will write each mapping command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. For example:
 ```
-# For example:
 bwa mem -t 6 Sm_v7_nohap.fa ERR3173238_1.fastq.gz ERR3173238_2.fastq.gz | samtools sort -@6 -o PZQ_popgen6472766.bam -
 ```
 
 ### Mark PCR duplicates
 ```
-parallel --dry-run --colsep '\t' "gatk MarkDuplicates --INPUT {1}.bam --OUTPUT {1}.markdup.bam --METRICS_FILE {1}.metrics.txt" :::: <(cat ../00_METADATA/supplementary_table_2.txt | grep "gz")
+parallel --dry-run --colsep '\t' "gatk MarkDuplicates --INPUT {1}.bam --OUTPUT {1}.markdup.bam --METRICS_FILE {1}.metrics.txt" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 ```
-The parallel command will write each markduplicate command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. 
+The parallel command will write each markduplicate command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. For example:
 ```
-# For example:
 gatk MarkDuplicates --INPUT PZQ_popgen6472766.bam --OUTPUT PZQ_popgen6472766.markdup.bam --METRICS_FILE PZQ_popgen6472766.metrics.txt
 ```
 
+### Per-sampling variant calling
+```
+# Index all BAM files
+parallel -j1 --colsep '\t' "samtools index {1}" <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+
+cd ${WORKING_DIR}/04_VCALLING
+# Variant call each sample
+parallel --dry-run "gatk HaplotypeCaller --emit-ref-confidence GVCF -I ${WORKING_DIR}/03_MAPPING/{1}.remarkdup.bam -R Sm_v7_nohap.fa -O {1}.g.vcf" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+
+```
 
 
 
