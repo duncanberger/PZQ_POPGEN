@@ -94,11 +94,11 @@ samtools index PZQ_popgen6472766
 gatk HaplotypeCaller --emit-ref-confidence GVCF -I /lustre/scratch118/infgen/team133/db22/crellen_remap/run_through/03_MAPPING/PZQ_popgen6472766.remarkdup.bam -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa -O PZQ_popgen6472766.g.vcf
 ```
 
-# Rename samples in each gVCF
+### Rename samples in each gVCF
 ```
 parallel --dry-run --colsep '\t' "gatk RenameSampleInVcf --INPUT {1}.g.vcf --OUTPUT {1}.renamed.g.vcf --NEW_SAMPLE_NAME {1}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 ```
-# Combine all samples into a single gVCF
+### Combine all samples into a single gVCF and genotype
 ```
 # Create and list of arguments for input into CombineGVCFs
 parallel -j1 --colsep '\t' "echo '--INPUT {1}.renamed.g.vcf'" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz") > argument.list
@@ -110,6 +110,47 @@ gatk CombineGVCFs --arguments_file argument.list --reference ${WORKING_DIR}/01_R
 gatk GenotypeGVCFs --reference ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant merged_all_samples.g.vcf --output merged_all_samples.vcf
 
 ```
+### Separate and filter SNPs, Indels and mixed sites
+```
+# Select SNPs
+gatk SelectVariants -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant merged_all_samples.vcf --select-type-to-include SNP --output merged_all_samples.SNPs.vcf
+
+# Filter SNPs
+gatk VariantFiltration \
+--filter-expression "ReadPosRankSum < -8.0" --filter-name "RPRS8" \
+--filter-expression "QD < 2.0" --filter-name "QD2" \
+--filter-expression "FS > 60.0" --filter-name "FS60" \
+--filter-expression "MQ < 40.0" --filter-name "MQ40" \
+--filter-expression "MQRankSum < -12.5" --filter-name "MQ12.5" \
+--filter-expression "SOR > 3.0" --filter-name "SOR3" \
+--variant merged_all_samples.SNPs.vcf \
+-R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa  \
+--output merged_all_samples.SNPs.tagged.vcf
+
+
+# Separate Indels and mixed sites (sites containing SNPs and Indels)
+
+```
+```
+# Select Indels and mixed sites
+gatk SelectVariants -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant merged_all_samples.vcf --select-type-to-include SNP --output merged_all_samples.indels_mixed.vcf
+
+# Filter Indels and mixed sites
+/lustre/scratch118/infgen/team133/db22/software/gatk-4.1.0.0/gatk VariantFiltration \
+--filter-expression "QD < 2.0" --filter-name "QD2" \
+--filter-expression "FS > 200.0" --filter-name "FS200" \
+--filter-expression "ReadPosRankSum < -20.0" --filter-name "RPRS20" \
+--filter-expression "SOR > 10.0" --filter-name "SOR10" \
+--variant merged_all_samples.indels_mixed.vcf \
+-R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa  \
+--output merged_all_samples.indels_mixed.tagged.vcf
+```
+
+
+
+
+
+
 
 
  
