@@ -69,4 +69,16 @@ The parallel command will write each mapping command to screen, which can be run
 bwa mem -t 6 Sm_v7_nohap.fa ERR3173238_1.fastq.gz ERR3173238_2.fastq.gz | samtools sort -@6 -o PZQ_popgen6472766.bam -
 ```
 
+### Mark PCR duplicates
+```
+parallel --dry-run --colsep '\t' "gatk MarkDuplicates --INPUT {1}.bam --OUTPUT {1}.markdup.bam --METRICS_FILE {1}.metrics.txt" :::: <(cat ../00_METADATA/supplementary_table_2.txt | grep "gz")
+```
+The parallel command will write each markduplicate command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. 
+```
+# For example:
+gatk MarkDuplicates --INPUT PZQ_popgen6472766.bam --OUTPUT PZQ_popgen6472766.markdup.bam --METRICS_FILE PZQ_popgen6472766.metrics.txt
+```
+
+
+
 
