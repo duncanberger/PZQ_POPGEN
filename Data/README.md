@@ -3,10 +3,10 @@
 ## Table of contents
 0. [Project overview](#overview)
 1. [Project setup](#setup)
-2. [Mapping](#mapping)
-3. [Variant calling](#variantcalling)
-4. [Quality control](#qc)
-5. [Analysis](#analysis)
+2. [Raw data](#setup)
+3. [Mapping](#mapping)
+4. [Variant calling](#variantcalling)
+5. [Quality control](#qc)
 
 ## 00 - Project overview
 
@@ -22,6 +22,7 @@ WORKING_DIR=${PWD}
 # make working directories
 mkdir 00_METADATA 01_REFERENCES 02_RAWDATA 03_MAPPING 04_VCALLING 05_QC 06_ANALYSIS
 ```
+## 02 - Raw data <a name="setup"></a>
 
 ### Reference genome
 Download the reference genome
@@ -44,10 +45,7 @@ samtools faidx Sm_v7_nohap.fa
 
 gatk CreateSequenceDictionary --REFERENCE Sm_v7_nohap.fa
 ```
-
-### Sample metadata
-
-## 02 - Mapping <a name="setup"></a>
+## 03 - Mapping <a name="setup"></a>
 ### Download sequence reads
 ```
 # Download FASTQ files in parallel
@@ -77,7 +75,7 @@ gatk MarkDuplicates --INPUT PZQ_popgen6472766.bam --OUTPUT PZQ_popgen6472766.mar
 # Index all BAM files
 parallel -j1 --colsep '\t' "samtools index {1}" <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 ```
-## 03 - Variant calling <a name="setup"></a>
+## 04 - Variant calling <a name="setup"></a>
 
 ### Per-sampling variant calling
 ```
@@ -109,7 +107,7 @@ gatk CombineGVCFs --arguments_file argument.list --reference ${WORKING_DIR}/01_R
 gatk GenotypeGVCFs --reference ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant merged_all_samples.g.vcf --output merged_all_samples.vcf
 ```
 
-## 04 - Quality control <a name="setup"></a>
+## 05 - Quality control <a name="setup"></a>
 ### Separate and filter SNPs
 ```
 # Select SNPs
