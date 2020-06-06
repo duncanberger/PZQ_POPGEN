@@ -189,3 +189,11 @@ vcftools --vcf merged_all_samples.filtered.vcf.FL3.vcf --recode --recode-INFO-al
 # Using an existing SnpEFF database 
 java -jar snpEff.jar Sm_v7.2 merged_all_samples.filtered.vcf.FL4.vcf > merged_all_samples.filtered.vcf.FL4.SNPEFF.vcf
 ```
+
+### Move final versions of VCFs to the analysis folder
+```
+mkdir ${WORKING_DIR}/06_ANALYSIS/FREEZE
+mv merged_all_samples.filtered.vcf.FL4.SNPEFF.vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.snpeff.vcf
+mv merged_all_samples.filtered.vcf.FL4.vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf
+```
+
