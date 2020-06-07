@@ -38,7 +38,6 @@ plink2 --bfile autosomes_unfiltered --allow-extra-chr --set-all-var-ids @_# --ex
 plink2 --bfile prunedData --allow-extra-chr --set-all-var-ids @_# --pca
 
 # Output can be passed to figure_2.R
-
 ```
 ### Neighbour-joining phylogeny
 ```
@@ -65,8 +64,13 @@ mkdir 6127
 cd 6127
 admixture -j2 --seed=6127 -B1000 ../prunedData.bed 1 --cv=10
 admixture -j2 --seed=6127 -B1000 ../prunedData.bed 2 --cv=10
-...
+# ... up to 20
+
+# Add K values to ADMIXTURE output files
+parallel --dry-run "sed -e 's/^/{1} /g' autosomes.{1}.Q" ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+cat *.Q > admixture_all.txt
+
+# Output can be passed to figure_2.R
 ```
-
-
-
+## 02 - Selection <a name="setup"></a>
+### Create plink files
