@@ -98,7 +98,7 @@ parallel --dry-run --colsep '\t' "gatk RenameSampleInVcf --INPUT {1}.g.vcf --OUT
 ### Combine all samples into a single gVCF and genotype
 ```
 # Create and list of arguments for input into CombineGVCFs
-parallel -j1 --colsep '\t' "echo '--INPUT {1}.renamed.g.vcf'" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz") > argument.list
+parallel -j1 --colsep '\t' "echo '--INPUT {1}.renamed.g.vcf'" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz" | cut -f1) > argument.list
 
 # Combine gVCFs
 gatk CombineGVCFs --arguments_file argument.list --reference ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --output merged_all_samples.g.vcf
