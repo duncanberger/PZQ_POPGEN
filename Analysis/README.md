@@ -73,4 +73,37 @@ cat *.Q > admixture_all.txt
 # Output can be passed to figure_2.R
 ```
 ## 02 - Selection <a name="setup"></a>
-### Create plink files
+### Create input VCFs
+```
+cd ${WORKING_DIR}/06_ANALYSIS/02_SELECTION
+# Select only biallelic variants
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/PZQ_POPGEN.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.vcf --min-alleles 2 --max-alleles 2
+
+# Split VCF into per-chromosome VCFs
+parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/PZQ_POPGEN.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.{}.vcf --chr {}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
+
+# E.g.
+vcftools --vcf PZQ_POPGEN.biallelic.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.SM_V7_1.vcf --chr SM_V7_1
+vcftools --vcf PZQ_POPGEN.biallelic.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.SM_V7_2.vcf --chr SM_V7_2
+
+# Produce subsets for each population
+cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz" | grep 'Mayuge' | cut -f4 > mayuge.list
+cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz" | grep 'Tororo' | cut -f4 > tororo.list
+
+parallel --dry-run "vcftools --vcf PZQ_POPGEN.biallelic.{1}.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.{1}.{2}.vcf --chr {1} --keep {2}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW :::: mayuge.list
+parallel --dry-run "vcftools --vcf PZQ_POPGEN.biallelic.{1}.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.{1}.{2}.vcf --chr {1} --keep {2}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW ::: tororo.list
+```
+### ?
+```
+
+```
+
+
+
+
+
+
+
+
+
+
