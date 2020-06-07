@@ -49,14 +49,14 @@ gatk CreateSequenceDictionary --REFERENCE Sm_v7_nohap.fa
 ### Download sequence reads
 ```
 # Download FASTQ files in parallel
-parallel -j4 --colsep '\t' "wget {1} {2}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.tx| cut -f13 | grep 'gz' | tr ';' '\t')
+parallel -j4 --colsep '\t' "wget {1} {2}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.tx| cut -f15 | grep 'gz' | tr ';' '\t')
 ```
 
 ### Map sequence reads to reference genome
 ```
 cd ${WORKING_DIR}/03_MAPPING
 
-parallel --dry-run --colsep '\t' "bwa mem -t 6 Sm_v7_nohap.fa {8}_1.fastq.gz {8}_2.fastq.gz | samtools sort -@6  {1}.bam -" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+parallel --dry-run --colsep '\t' "bwa mem -t 6 Sm_v7_nohap.fa {10}_1.fastq.gz {10}_2.fastq.gz | samtools sort -@6  {1}.bam -" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 ```
 
 The parallel command will write each mapping command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. For example:
