@@ -10,7 +10,6 @@
 ### Setup a working environment for the analysis.
 In my work environment, it is: ${WORKING_DIR}
 ```
-cd ${HOME}/HELMINTH_EXTRACTION_WGS/
 WORKING_DIR=${PWD}
 cd ${WORKING_DIR}/06_ANALYSIS
 
