@@ -85,25 +85,62 @@ parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/PZQ_POPGEN.vcf --r
 # E.g.
 vcftools --vcf PZQ_POPGEN.biallelic.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.SM_V7_1.vcf --chr SM_V7_1
 vcftools --vcf PZQ_POPGEN.biallelic.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.SM_V7_2.vcf --chr SM_V7_2
+```
 
+### Statistically phase variants using BEAGLE
+```
+# Phase variants for each vcf file using BEAGLE
+parallel --dry-run "java -jar beagle.28Sep18.793.jar gt=PZQ_POPGEN.biallelic.{}.vcf out=PZQ_POPGEN.biallelic.{}.beagle map={}.gmap nthreads=4 iterations=100 burnin=10 ne=65000" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
+```
+### Create genetic maps
+```
+INSERT METHOD HERE
+```
 # Produce subsets for each population
+```
 cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz" | grep 'Mayuge' | cut -f4 > mayuge.list
 cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz" | grep 'Tororo' | cut -f4 > tororo.list
-
-parallel --dry-run "vcftools --vcf PZQ_POPGEN.biallelic.{1}.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.{1}.{2}.vcf --chr {1} --keep {2}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW :::: mayuge.list
-parallel --dry-run "vcftools --vcf PZQ_POPGEN.biallelic.{1}.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.{1}.{2}.vcf --chr {1} --keep {2}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW ::: tororo.list
+#EDIT KEEP MISSING VARIANTS
+parallel --dry-run "vcftools --vcf PZQ_POPGEN.biallelic.{}.beagle.vcf.gz --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.{1}.mayuge.vcf --chr {1} --keep {2}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW :::: mayuge.list
+parallel --dry-run "vcftools --vcf PZQ_POPGEN.biallelic.{}.beagle.vcf.gz --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.{1}.tororo.vcf --chr {1} --keep {2}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW ::: tororo.list
 ```
-### ?
+### Calculate IHS for each district (per chromosome)
 ```
+# Calculate IHS
+parallel --dry-run "selscan --ihs --vcf PZQ_POPGEN.biallelic.{1}.{2}.vcf --map {1}.gmap --threads 2 --out {1}.{2}.MAYUGE" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW ::: mayuge tororo
 
+# Normalize
+norm --ihs --files SM_V7_1.mayuge.ihs.out SM_V7_2.mayuge.ihs.out SM_V7_3.mayuge.ihs.out SM_V7_4.mayuge.ihs.out SM_V7_5.mayuge.ihs.out SM_V7_6.mayuge.ihs.out SM_V7_7.mayuge.ihs.out SM_V7_ZW.mayuge.ihs.out
+norm --ihs --files SM_V7_1.tororo.ihs.out SM_V7_2.tororo.ihs.out SM_V7_3.tororo.ihs.out SM_V7_4.tororo.ihs.out SM_V7_5.tororo.ihs.out SM_V7_6.tororo.ihs.out SM_V7_7.tororo.ihs.out SM_V7_ZW.tororo.ihs.out
+
+# Add chromosome names to normalized IHS results
+parallel --dry-run "sed -e 's/^/{1}\t/g' {1}.{2}.ihs.out.100bins.norm > {1}.{2}.ihs.out.100bins.norm.temp" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW ::: mayuge tororo
+
+cat *.mayuge.ihs.out.100bins.norm.temp | sed 's/SM_V7_//g' > mayuge.ihs.out.100bins.norm.all
+cat *.tororo.ihs.out.100bins.norm.temp | sed 's/SM_V7_//g' > tororo.ihs.out.100bins.norm.all
+
+# Output can be passed to figure_3.R
 ```
+### Calculate XP-EHH between districts (per chromosome)
+```
+parallel --dry-run "selscan --xpehh --vcf PZQ_POPGEN.biallelic.{}.mayuge.vcf --vcf-ref PZQ_POPGEN.biallelic.{}.tororo.vcf --map {}.gmap --threads 2 --out {}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
+
+#Normalize
+norm --xpehh --files SM_V7_1.xpehh.out SM_V7_2.xpehh.out SM_V7_3.xpehh.out SM_V7_4.xpehh.out SM_V7_5.xpehh.out SM_V7_6.xpehh.out SM_V7_7.xpehh.out SM_V7_ZW.xpehh.out
 
 
+# Create header for XP-EHH results
+head -1 SM_V7_7.xpehh.out.norm | sed -e '1s/id/chromosome\tid/g' 
+head -1 SM_V7_7.xpehh.out.norm | sed -e '1s/id/chromosome\tid/g'  > header.xpehh
+# Add chromosome names to normalised XP-EHH results
+parallel --dry-run "sed -e 's/^/{1}\t/g' {}.xpehh.out.norm > {}.xpehh.out.norm.temp" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW 
 
-
-
-
-
-
-
-
+cat *.xpehh.out.norm.temp > xpehh.out.norm.all
+# Output can be passed to figure_3.R
+```
+### Calculate CLR with districts (per chromosome)
+```
+```
+### Calculate FST between districts (per chromosome)
+```
+```
