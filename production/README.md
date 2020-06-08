@@ -49,14 +49,14 @@ gatk CreateSequenceDictionary --REFERENCE Sm_v7_nohap.fa
 ### Download sequence reads
 ```
 # Download FASTQ files in parallel
-parallel -j4 --colsep '\t' "wget {1} {2}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.tx| cut -f15 | grep 'gz' | tr ';' '\t')
+parallel -j4 --colsep '\t' "wget {1} {2}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | cut -f16 | grep 'gz' | tr ';' '\t')
 ```
 
 ### Map sequence reads to reference genome
 ```
 cd ${WORKING_DIR}/03_MAPPING
 
-parallel --dry-run --colsep '\t' "bwa mem -t 6 Sm_v7_nohap.fa {10}_1.fastq.gz {10}_2.fastq.gz | samtools sort -@6  {1}.bam -" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+parallel --dry-run --colsep '\t' "bwa mem -t 6 Sm_v7_nohap.fa {11}_1.fastq.gz {11}_2.fastq.gz | samtools sort -@6  {1}.bam -" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 ```
 
 The parallel command will write each mapping command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. For example:
@@ -189,7 +189,7 @@ mv merged_all_samples.filtered.vcf.FL4.vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ
 ```
 ### Produce an allsites VCF (for analayses with PIXY)
 ```
-# Genotype the gVCF again invlude invariant sites (can be run for each chromosome with '-L' option). 
+# Genotype the gVCF again include invariant sites (can be run for each chromosome with '-L' option). 
 gatk GenotypeGVCFs --reference REF --variant merged_all_samples.g.vcf --include-non-variant-sites --output merged_all_samples.allsites.vcf
 
 # Remove samples that were filtered out 
