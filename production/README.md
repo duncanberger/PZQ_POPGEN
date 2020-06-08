@@ -63,7 +63,6 @@ The parallel command will write each mapping command to screen, which can be run
 ```
 bwa mem -t 6 ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa ERR3173238_1.fastq.gz ERR3173238_2.fastq.gz | samtools sort -@6 -o PZQ_popgen6472766.bam -
 ```
-
 ### Mark PCR duplicates
 ```
 parallel --dry-run --colsep '\t' "gatk MarkDuplicates --INPUT {1}.bam --OUTPUT {1}.markdup.bam --METRICS_FILE {1}.metrics.txt" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
@@ -90,7 +89,6 @@ samtools index PZQ_popgen6472766
 
 gatk HaplotypeCaller --emit-ref-confidence GVCF -I /lustre/scratch118/infgen/team133/db22/crellen_remap/run_through/03_MAPPING/PZQ_popgen6472766.remarkdup.bam -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa -O PZQ_popgen6472766.g.vcf
 ```
-
 ### Rename samples in each gVCF
 ```
 parallel --dry-run --colsep '\t' "gatk RenameSampleInVcf --INPUT {1}.g.vcf --OUTPUT {1}.renamed.g.vcf --NEW_SAMPLE_NAME {1}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
@@ -171,7 +169,7 @@ vcftools --vcf merged_all_samples.filtered.vcf.FL1.vcf --postions retain.variant
 # Calculate inbreeding coefficient
 vcftools --vcf merged_all_samples.filtered.vcf.FL2.vcf --het --out ib
 
-# Remove sites with excessively low inbreeding coefficient
+# Remove samples with excessively low inbreeding coefficient
 awk '$5<-0.3' ib.het | grep -v "INDV" | cut -f1 > retain.IB.samples.list
 vcftools --vcf merged_all_samples.filtered.vcf.FL2.vcf --keep retain.IB.samples.list --recode-INFO-all --recode --out merged_all_samples.filtered.vcf.FL3.vcf
 
@@ -183,10 +181,21 @@ vcftools --vcf merged_all_samples.filtered.vcf.FL3.vcf --recode --recode-INFO-al
 # Using an existing SnpEFF database 
 java -jar snpEff.jar Sm_v7.2 merged_all_samples.filtered.vcf.FL4.vcf > merged_all_samples.filtered.vcf.FL4.SNPEFF.vcf
 ```
-
 ### Move final versions of VCFs to the analysis folder
 ```
 mkdir ${WORKING_DIR}/06_ANALYSIS/FREEZE
 mv merged_all_samples.filtered.vcf.FL4.SNPEFF.vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.snpeff.vcf
 mv merged_all_samples.filtered.vcf.FL4.vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf
+```
+### Produce an allsites VCF (for analayses with PIXY)
+```
+# Genotype the gVCF again invlude invariant sites (can be run for each chromosome with '-L' option). 
+gatk GenotypeGVCFs --reference REF --variant merged_all_samples.g.vcf --include-non-variant-sites --output merged_all_samples.allsites.vcf
+
+# Remove samples that were filtered out 
+cat retain.samples.list retain.IB.samples.list | sort | uniq > all.retained.list
+vcftools --vcf merged_all_samples.allsites.vcf --keep all.retained.list --recode-INFO-all --recode --out merged_all_samples.allsites.198.vcf
+
+# Move to analysis folder
+mv merged_all_samples.allsites.198.vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.allsites.vcf
 ```
