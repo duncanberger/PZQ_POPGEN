@@ -23,6 +23,7 @@ mkdir 00_SCRIPTS 01_STRUCTURE 02_SELECTION 03_ASSOCIATION
 #Selection - beagle, sweed, ihs, xpehh, fst
 #Assocation
 ```
+___
 ## 01 - Population structure <a name="setup"></a>
 ### Create plink files
 ```
@@ -72,6 +73,7 @@ cat *.Q > admixture_all.txt
 
 # Output can be passed to figure_2.R
 ```
+___
 ## 02 - Selection <a name="setup"></a>
 ### Create input VCFs
 ```
@@ -144,3 +146,4 @@ cat *.xpehh.out.norm.temp > xpehh.out.norm.all
 ### Calculate FST between districts (per chromosome)
 ```
 ```
+___
