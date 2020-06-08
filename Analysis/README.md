@@ -26,6 +26,8 @@ ___
 ## 01 - Population structure <a name="setup"></a>
 ### Create plink files
 ```
+cd 01_STRUCTURE
+
 # Convert vcf to plink .bed format, select autosomes. 
 plink2 --vcf ${WORKING_DIR}/06_ANALYSIS/PZQ_POPGEN.vcf --chr SM_V7_1, SM_V7_2, SM_V7_3, SM_V7_4, SM_V7_5, SM_V7_6, SM_V7_7 --make-bed --allow-extra-chr --set-all-var-ids @_# --out autosomes_unfiltered
 
@@ -47,7 +49,7 @@ paste <( cut -f2 prunedData_tree.mdist.id) prunedData_tree.mdist | cat <(cut -f2
 
 # Output can be passed to figure_2.R
 ```
-### ADMIXTURE
+### Admixture
 ```
 #Fix scaffold names in bim file (ADMIXTURE accepts numerical scaffold names only)
 sed -i 's/SM_V7_//g' prunedData.bim
@@ -71,6 +73,44 @@ parallel --dry-run "sed -e 's/^/{1} /g' autosomes.{1}.Q" ::: 1 2 3 4 5 6 7 8 9 1
 cat *.Q > admixture_all.txt
 
 # Output can be passed to figure_2.R
+```
+### Nucleotide diversity, F<sub>ST</sub> and d<sub>XY</sub>
+```
+# Create list for each level of population
+cut -f1,2 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ > host.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ > school.list
+cut -f1,4 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ > district.list
+cut -f1,6 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ > treatment.list
+
+# Subset the allsites VCF for each chromosome
+parallel --dry-run "vcftools --vcf PZQ_POPGEN.allsites.vcf --chr {} --recode-INFO-all --recode --out PZQ_POPGEN.allsites.{}.vcf" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
+
+# Run PIXY (this is an example which will write command for calculate the 3 statistics for each population and chromosome)
+parallel --dry-run "pixy --stats fst dxy pi 
+--vcf PZQ_POPGEN.allsites.{1}.vcf 
+--zarr_path zarr/ 
+--window_size {2}
+#--reuse_zarr yes # Add after the first run has been completed
+--populations {3}.list # Repeat for each of the 3 other lists
+--variant_filter_expression 'DP>=10,GQ>=20,RGQ>=20' 
+--invariant_filter_expression 'DP>=10,RGQ>=20' 
+--outfile_prefix output/pixy.{1}.{2}.{3}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW ::: 5000 25000 ::: host school district treatment
+
+# Create headers for each statistic (doesn't matter which file you use, as long as it's specific to each statistic)
+head -1 pixy.SM_V7_1.5000.school_fst.txt > fst.header
+head -1 pixy.SM_V7_1.5000.school_dxy.txt > dxy.header
+head -1 pixy.SM_V7_1.5000.school_pi.txt > pi.header
+
+# Combine files for each chromosome
+cat pixy.SM_V7_*.5000.school_pi.txt | grep -v pop | cat pi.header - > pi.school.txt # Output can be passed to figure_2.R
+cat pixy.SM_V7_*.5000.host_pi.txt | grep -v pop | cat pi.header - > pi.host.txt # Output can be passed to supplementary_figure_5.R
+cat pixy.SM_V7_*.5000.treatment_pi.txt | grep -v pop | cat pi.header - > pi.treatment.txt # Output can be passed to figure_4.R
+cat pixy.SM_V7_*.5000.school_fst.txt | grep -v pop | cat fst.header - > fst.school.txt # Output can be passed to figure_2.R
+cat pixy.SM_V7_*.5000.school_dxy.txt | grep -v pop | cat dxy.header - > .school.txt # Output can be passed to figure_2.R
+cat pixy.SM_V7_*.5000.treatment_fst.txt | grep -v pop | cat fst.header - > fst.treatment.txt # Output can be passed to figure_4.R
+cat pixy.SM_V7_*.5000.treatment_dxy.txt | grep -v pop | cat dxy.header - > dxy.treatment.txt # Output can be passed to figure_4.R
+
+
 ```
 ___
 ## 02 - Selection <a name="setup"></a>
@@ -137,12 +177,38 @@ head -1 SM_V7_7.xpehh.out.norm | sed -e '1s/id/chromosome\tid/g'  > header.xpehh
 parallel --dry-run "sed -e 's/^/{1}\t/g' {}.xpehh.out.norm > {}.xpehh.out.norm.temp" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW 
 
 cat *.xpehh.out.norm.temp > xpehh.out.norm.all
+
 # Output can be passed to figure_3.R
 ```
 ### Calculate CLR with districts (per chromosome)
 ```
+# Calculate CLR per district, per chromosome
+parallel --dry-run "SweeD-P -name {1}.{2} -input PZQ_POPGEN.biallelic.{1}.{2}.vcf -grid 20000" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW ::: mayuge tororo
+
+# Add chromosome name to output
+parallel --dry-run "grep -v '/' SweeD_Report.{1}.{2} | grep -v 'al' -i | grep -v '^$' | sed -e 's/^/{1}\t/g' > {1}.{2}.swd.temp" ::: SM_V7_1 ::: mayuge tororo
+
+# Combine output for each district
+cat *.mayuge.swd.temp > all.mayuge.swd
+cat *.tororo.swd.temp > all.tororo.swd
+
+# Output can be passed to figure_3.R
 ```
 ### Calculate FST between districts (per chromosome)
 ```
+# Run PIXY (described above too, the specific command is)
+parallel --dry-run "pixy --stats fst 
+--vcf PZQ_POPGEN.allsites.{1}.vcf 
+--zarr_path zarr/ 
+--window_size 25000
+--reuse_zarr yes
+--populations district.list 
+--variant_filter_expression 'DP>=10,GQ>=20,RGQ>=20' 
+--invariant_filter_expression 'DP>=10,RGQ>=20' 
+--outfile_prefix output/pixy.{1}.25000.district" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
+
+cat pixy.SM_V7_*.25000.district_fst.txt | grep -v pop | cat fst.header - > fst.district.txt 
+
+# Output can be passed to figure_3.R
 ```
 ___
