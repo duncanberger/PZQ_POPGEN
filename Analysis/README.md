@@ -96,7 +96,7 @@ parallel --dry-run "java -jar beagle.28Sep18.793.jar gt=PZQ_POPGEN.biallelic.{}.
 ```
 INSERT METHOD HERE
 ```
-# Produce subsets for each population
+### Produce subsets for each population
 ```
 cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz" | grep 'Mayuge' | cut -f4 > mayuge.list
 cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz" | grep 'Tororo' | cut -f4 > tororo.list
