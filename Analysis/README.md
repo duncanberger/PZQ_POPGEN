@@ -23,7 +23,7 @@ mkdir 00_SCRIPTS 01_STRUCTURE 02_SELECTION 03_ASSOCIATION
 #Selection - beagle, sweed, ihs, xpehh, fst
 #Assocation
 ```
-## 02 - Population structure <a name="setup"></a>
+## 01 - Population structure <a name="setup"></a>
 ### Create plink files
 ```
 # Convert vcf to plink .bed format, select autosomes. 
