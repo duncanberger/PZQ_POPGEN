@@ -66,6 +66,11 @@ parallel --dry-run "sed -e 's/^/{1} /g' autosomes.{1}.Q" ::: 1 2 3 4 5 6 7 8 9 1
 cat *.Q > admixture_all.txt
 
 # Output can be passed to figure_2.R
+
+# Get a table of CV scores, found in the stdout files (in our case *.o files)
+cat *.o | grep CV | cut -f2 -d "=" | sed 's/)://g' | tr ' ' '\t' > cv_scores.txt
+
+# Output can be passed to supplementary_figure_2.R
 ```
 ### Nucleotide diversity, F<sub>ST</sub> and d<sub>XY</sub>
 ```
