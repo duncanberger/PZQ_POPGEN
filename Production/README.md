@@ -187,7 +187,7 @@ vcftools --vcf merged_all_samples.filtered.vcf.FL3.vcf --recode --recode-INFO-al
 # Using an existing SnpEFF database 
 java -jar snpEff.jar Sm_v7.2 merged_all_samples.filtered.vcf.FL4.vcf > merged_all_samples.filtered.vcf.FL4.SNPEFF.vcf
 ```
-### Produce an allsites VCF (for analayses with PIXY)
+### Produce an allsites VCF (for analyses with PIXY)
 ```
 # Genotype the gVCF again include invariant sites (can be run for each chromosome with '-L' option). 
 gatk GenotypeGVCFs --reference REF --variant merged_all_samples.g.vcf --include-non-variant-sites --output merged_all_samples.allsites.vcf
