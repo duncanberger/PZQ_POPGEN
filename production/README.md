@@ -114,6 +114,7 @@ gatk VariantsToTable --variant merged_all_samples.vcf -F CHROM -F POS -F TYPE -F
 # Output can be passed to supplementary_figure_1.R
 ```
 ### Separate and filter SNPs
+```
 # Select SNPs
 gatk SelectVariants -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant merged_all_samples.vcf --select-type-to-include SNP --output merged_all_samples.SNPs.vcf
 
