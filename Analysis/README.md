@@ -8,19 +8,12 @@
 
 ## 00 - Project setup <a name="setup"></a>
 ### Setup a working environment for the analysis.
-In my work environment, it is: ${WORKING_DIR}
 ```
 WORKING_DIR=${PWD}
 cd ${WORKING_DIR}/06_ANALYSIS
 
 # make working directories
 mkdir 00_SCRIPTS 01_STRUCTURE 02_SELECTION 03_ASSOCIATION
-
-#Kinship
-#Recombination
-#Structure - PCA, tree, admixture, pixy
-#Selection - beagle, sweed, ihs, xpehh, fst
-#Assocation
 ```
 ___
 ## 01 - Population structure <a name="setup"></a>
@@ -80,7 +73,7 @@ cat *.Q > admixture_all.txt
 cut -f1,2 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ > host.list
 cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ > school.list
 cut -f1,4 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ > district.list
-cut -f1,6 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ > treatment.list
+cut -f1,3,6 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep -v Kocoge | grep PZQ > treatment.list
 
 # Subset the allsites VCF for each chromosome
 parallel --dry-run "vcftools --vcf PZQ_POPGEN.allsites.vcf --chr {} --recode-INFO-all --recode --out PZQ_POPGEN.allsites.{}.vcf" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
@@ -109,8 +102,35 @@ cat pixy.SM_V7_*.5000.school_fst.txt | grep -v pop | cat fst.header - > fst.scho
 cat pixy.SM_V7_*.5000.school_dxy.txt | grep -v pop | cat dxy.header - > .school.txt # Output can be passed to figure_2.R
 cat pixy.SM_V7_*.5000.treatment_fst.txt | grep -v pop | cat fst.header - > fst.treatment.txt # Output can be passed to figure_4.R
 cat pixy.SM_V7_*.5000.treatment_dxy.txt | grep -v pop | cat dxy.header - > dxy.treatment.txt # Output can be passed to figure_4.R
+```
+### Recombination
+```
+# Create input files for each population
+cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep "Kocoge" > kocoge.list
+cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | shuf | head -17 > mayuge_1.list
+cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f mayuge_1.list | shuf | head -17 > mayuge_2.list
+cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list) | shuf | head -17 > mayuge_3.list
+cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list) | shuf | head -17 > mayuge_4.list
+cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list) | shuf | head -17 > mayuge_5.list
 
+parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/PZQ_POPGEN.vcf --geno-r2 --out {.} --keep {} --min-r2 0.1 --ld-window-bp 50000 --maf 0.05" ::: kocoge.list mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list mayuge_5.list
 
+# Calculate median r2 for each distance
+parallel "awk '{print $1,$3-$2,$5}' {}.geno.ld | grep -v CHR | tr ' ' '\t' | sort -k1,1 -k2,2 | datamash -g 1,2 median 3 > {}.median.txt" ::: mayuge_1 mayuge_2 mayuge_3 mayuge_4 mauge_5 kocoge
+
+# Combine samples from Mayuge district
+cat mayuge_*.median.txt > all.median.mayuge.geno.ld
+mv kocoge.median.txt all.median.kocoge.geno.ld
+
+# Output can be passed to supplementary_figure_6.R
+```
+### Kinship
+```
+# Fix plink bim files
+sed -i 's/SM_V7_//g' autosomes_unfiltered.bim
+
+# Run King
+king -bfile ${WORKING_DIR}/06_ANALYSIS/01_STRUCTURE/autosomes_unfiltered.bed --related --prefix autosomes_unfiltered
 ```
 ___
 ## 02 - Selection <a name="setup"></a>
@@ -127,7 +147,6 @@ parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/PZQ_POPGEN.vcf --r
 vcftools --vcf PZQ_POPGEN.biallelic.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.SM_V7_1.vcf --chr SM_V7_1
 vcftools --vcf PZQ_POPGEN.biallelic.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.SM_V7_2.vcf --chr SM_V7_2
 ```
-
 ### Statistically phase variants using BEAGLE
 ```
 # Phase variants for each vcf file using BEAGLE
@@ -168,7 +187,6 @@ parallel --dry-run "selscan --xpehh --vcf PZQ_POPGEN.biallelic.{}.mayuge.vcf --v
 
 #Normalize
 norm --xpehh --files SM_V7_1.xpehh.out SM_V7_2.xpehh.out SM_V7_3.xpehh.out SM_V7_4.xpehh.out SM_V7_5.xpehh.out SM_V7_6.xpehh.out SM_V7_7.xpehh.out SM_V7_ZW.xpehh.out
-
 
 # Create header for XP-EHH results
 head -1 SM_V7_7.xpehh.out.norm | sed -e '1s/id/chromosome\tid/g' 
@@ -212,3 +230,30 @@ cat pixy.SM_V7_*.25000.district_fst.txt | grep -v pop | cat fst.header - > fst.d
 # Output can be passed to figure_3.R
 ```
 ___
+## 03 - Association <a name="setup"></a>
+```
+# Create phenotype and covariate files
+cut -f1,4 /00_METADATA/supplementary_table_2.txt | grep PZQ | sed -e 's/^/0\t/g' | sed 's/Good_clearers/1/g' | sed 's/Post-treatment/2/g' | grep -v 'Pre' > bin_treatment.pheno
+cut -f1,7 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | sed -e 's/^/0\t/g' > quant_ERR.pheno
+cut -f2,3,4,5,6 ${WORKING_DIR}/06_ANALYSIS/01_STRUCTURE/prunedData.eigenvec | grep -v 'PC' | sed -e 's/^/0\t/g' > pca_covar_4.txt
+```
+### Binary trait association (Mayuge good vs post-treatment)
+```
+# Run the association test (use plink1.9)
+plink --logistic --bfile ${WORKING_DIR}/06_ANALYSIS/01_STRUCTURE/prunedData --allow-extra-chr --allow-no-sex --out BIN_assoc_covar4_mayuge_maf --adjust --covar pca_covar_4.txt --pheno bin_treatment.pheno --set-missing-var-ids @[# --keep mayuge.list --chr 1,2,3,4,5,6,7 --maf 0.05 --keep treatment.list
+
+# Fix output
+cat BIN_assoc_covar4_mayuge_maf.logistic.adjusted | tr -s ' ' | sed 's/^ //g' | sed -e '2,$s/_/ /' | sed 's/SNP/CHR SNP/g' | tr ' ' '\t' > BIN_assoc_covar4_mayuge_maf.logistic.adjusted.tbl
+
+# Output can be passed to figure_4.R
+```
+### Quantitative trait association (Using host ERR values)
+```
+# Run the association test (use plink1.9)
+plink --linear --bfile ${WORKING_DIR}/06_ANALYSIS/01_STRUCTURE/prunedData --allow-extra-chr --allow-no-sex --out ERR_linear_covar4_mayuge_maf --adjust --covar pca_covar_4.txt --pheno quant_ERR.pheno --all-pheno --set-missing-var-ids @[# --keep treatment.list --maf 0.05 --chr 1,2,3,4,5,6,7
+
+# Fix output
+cat ERR_linear_covar4_mayuge_maf.linear.adjusted | tr -s ' ' | sed 's/^ //g' | sed -e '2,$s/_/ /' | sed 's/SNP/CHR SNP/g' | tr ' ' '\t' > ERR_linear_covar4_mayuge_maf.linear.adjusted.tbl
+
+# Output can be passed to figure_4.R
+```
