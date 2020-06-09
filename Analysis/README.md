@@ -106,12 +106,12 @@ cat pixy.SM_V7_*.5000.treatment_dxy.txt | grep -v pop | cat dxy.header - > dxy.t
 ### Recombination
 ```
 # Create input files for each population
-cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep "Kocoge" > kocoge.list
-cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | shuf | head -17 > mayuge_1.list
-cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f mayuge_1.list | shuf | head -17 > mayuge_2.list
-cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list) | shuf | head -17 > mayuge_3.list
-cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list) | shuf | head -17 > mayuge_4.list
-cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list) | shuf | head -17 > mayuge_5.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | grep "Kocoge" > kocoge.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | shuf | head -17 > mayuge_1.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f mayuge_1.list | shuf | head -17 > mayuge_2.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list) | shuf | head -17 > mayuge_3.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list) | shuf | head -17 > mayuge_4.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list) | shuf | head -17 > mayuge_5.list
 
 parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --geno-r2 --out {.} --keep {} --min-r2 0.1 --ld-window-bp 50000 --maf 0.05" ::: kocoge.list mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list mayuge_5.list
 
