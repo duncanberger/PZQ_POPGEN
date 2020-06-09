@@ -55,7 +55,7 @@ parallel -j4 --colsep '\t' "wget {1} {2}" :::: <(cat ${WORKING_DIR}/00_METADATA/
 ```
 cd ${WORKING_DIR}/03_MAPPING
 
-parallel --dry-run --colsep '\t' "bwa mem -t 6 Sm_v7_nohap.fa {12}_1.fastq.gz {11}_2.fastq.gz | samtools sort -@6 {1}.bam -" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+parallel --dry-run --colsep '\t' "bwa mem -t 6 Sm_v7_nohap.fa {12}_1.fastq.gz {12}_2.fastq.gz | samtools sort -@6 {1}.bam -" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 ```
 
 The parallel command will write each mapping command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. For example:
