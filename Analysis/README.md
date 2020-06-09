@@ -22,7 +22,7 @@ ___
 cd 01_STRUCTURE
 
 # Convert vcf to plink .bed format, select autosomes. 
-plink2 --vcf ${WORKING_DIR}/06_ANALYSIS/PZQ_POPGEN.vcf --chr SM_V7_1, SM_V7_2, SM_V7_3, SM_V7_4, SM_V7_5, SM_V7_6, SM_V7_7 --make-bed --allow-extra-chr --set-all-var-ids @_# --out autosomes_unfiltered
+plink2 --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --chr SM_V7_1, SM_V7_2, SM_V7_3, SM_V7_4, SM_V7_5, SM_V7_6, SM_V7_7 --make-bed --allow-extra-chr --set-all-var-ids @_# --out autosomes_unfiltered
 
 # Remove variants in strong linkage disequilibrium
 plink2 --bfile autosomes_unfiltered --allow-extra-chr --set-all-var-ids @_# --indep-pairwise 50 10 0.15
@@ -76,11 +76,11 @@ cut -f1,4 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ > dist
 cut -f1,3,6 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep -v Kocoge | grep PZQ > treatment.list
 
 # Subset the allsites VCF for each chromosome
-parallel --dry-run "vcftools --vcf PZQ_POPGEN.allsites.vcf --chr {} --recode-INFO-all --recode --out PZQ_POPGEN.allsites.{}.vcf" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
+parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.allsites.vcf --chr {} --recode-INFO-all --recode --out PZQ_POPGEN.allsites.{}.vcf" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
 
 # Run PIXY (this is an example which will write command for calculate the 3 statistics for each population and chromosome)
 parallel --dry-run "pixy --stats fst dxy pi 
---vcf PZQ_POPGEN.allsites.{1}.vcf 
+--vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.allsites.{1}.vcf 
 --zarr_path zarr/ 
 --window_size {2}
 #--reuse_zarr yes # Add after the first run has been completed
@@ -113,7 +113,7 @@ cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" |
 cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list) | shuf | head -17 > mayuge_4.list
 cut -f1,3 /00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list) | shuf | head -17 > mayuge_5.list
 
-parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/PZQ_POPGEN.vcf --geno-r2 --out {.} --keep {} --min-r2 0.1 --ld-window-bp 50000 --maf 0.05" ::: kocoge.list mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list mayuge_5.list
+parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --geno-r2 --out {.} --keep {} --min-r2 0.1 --ld-window-bp 50000 --maf 0.05" ::: kocoge.list mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list mayuge_5.list
 
 # Calculate median r2 for each distance
 parallel "awk '{print $1,$3-$2,$5}' {}.geno.ld | grep -v CHR | tr ' ' '\t' | sort -k1,1 -k2,2 | datamash -g 1,2 median 3 > {}.median.txt" ::: mayuge_1 mayuge_2 mayuge_3 mayuge_4 mauge_5 kocoge
@@ -138,10 +138,10 @@ ___
 ```
 cd ${WORKING_DIR}/06_ANALYSIS/02_SELECTION
 # Select only biallelic variants
-vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/PZQ_POPGEN.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.vcf --min-alleles 2 --max-alleles 2
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.vcf --min-alleles 2 --max-alleles 2
 
 # Split VCF into per-chromosome VCFs
-parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/PZQ_POPGEN.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.{}.vcf --chr {}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
+parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.{}.vcf --chr {}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
 
 # E.g.
 vcftools --vcf PZQ_POPGEN.biallelic.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.SM_V7_1.vcf --chr SM_V7_1
