@@ -50,16 +50,14 @@ gatk CreateSequenceDictionary --REFERENCE Sm_v7_nohap.fa
 # Download FASTQ files in parallel
 parallel -j4 --colsep '\t' "wget {1} {2}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | cut -f17 | grep 'gz' | tr ';' '\t')
 ```
-
 ### Map sequence reads to reference genome
 ```
 cd ${WORKING_DIR}/03_MAPPING
 
 parallel --dry-run --colsep '\t' "bwa mem -t 6 Sm_v7_nohap.fa {12}_1.fastq.gz {12}_2.fastq.gz | samtools sort -@6 {1}.bam -" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
-```
 
-The parallel command will write each mapping command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. For example:
-```
+#The parallel command will write each mapping command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. For example:
+
 bwa mem -t 6 ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa ERR3173238_1.fastq.gz ERR3173238_2.fastq.gz | samtools sort -@6 -o PZQ_popgen6472766.bam -
 ```
 ### Mark PCR duplicates
@@ -81,11 +79,9 @@ cd ${WORKING_DIR}/04_VCALLING
 
 # Variant call each sample
 parallel --dry-run "gatk HaplotypeCaller --emit-ref-confidence GVCF -I ${WORKING_DIR}/03_MAPPING/{1}.remarkdup.bam -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa -O {1}.g.vcf" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
-```
-For example:
-```
-samtools index PZQ_popgen6472766
 
+#For example:
+samtools index PZQ_popgen6472766
 gatk HaplotypeCaller --emit-ref-confidence GVCF -I /lustre/scratch118/infgen/team133/db22/crellen_remap/run_through/03_MAPPING/PZQ_popgen6472766.remarkdup.bam -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa -O PZQ_popgen6472766.g.vcf
 ```
 ### Rename samples in each gVCF
