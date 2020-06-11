@@ -63,7 +63,57 @@ pi_all <- ggplot(data=treatment_5kb_pi_2, aes(x=pop, y=log10(avg_pi), fill=pop, 
         axis.text = element_text(color = "black"))
 ```
 ## Figure 4B:  <a name="figure4b"></a>
+### Calculate median F<sub>ST</sub> 
 ```{r}
+# Read in data
+autosome_5kb_treatment_fst <- read.table("autosomes.fst.5kb.treatment.txt", header=TRUE)
+
+# Remove NA values and set all negative values to zero
+autosome_5kb_treatment_fst_1 <- subset(autosome_5kb_treatment_fst, avg_wc_fst!="NaN" & avg_wc_fst!="NA")
+autosome_5kb_treatment_fst_1[autosome_5kb_fst_1 < 0] <- 0
+
+# Subset each target population
+autosome_5kb_treatment_fst_1_POST_PRE <- subset(autosome_5kb_fst_1, pop1=="Post-treatment" & pop2=="Pre-treatment")
+autosome_5kb_treatment_fst_1_Good_PRE <- subset(autosome_5kb_fst_1, pop1=="Good_clearers" & pop2=="Pre-treatment")
+autosome_5kb_treatment_fst_1_Good_POST <- subset(autosome_5kb_fst_1, pop1=="Good_clearers" & pop2=="Post-treatment")
+
+# Calculate mean and median FST values for each treatment group (example for one comparison only)
+median(autosome_5kb_treatment_fst_1_Good_POST$avg_wc_fst)
+mean(autosome_5kb_treatment_fst_1_Good_POST$avg_wc_fst)
+bstrap_means <- c()
+bstrap_medians <- c()
+
+# Calculate bootstrap medians, mean and quantiles (example for one comparison only)
+for (i in 1:100) { 
+  bstrap_medians <- c(bstrap_medians,median(sample(autosome_5kb_treatment_fst_1_Good_POST$avg_wc_fst,size=length(autosome_5kb_treatment_fst_1_Good_POST$avg_wc_fst),replace=TRUE)))
+  bstrap_means <- c(bstrap_means,mean(sample(autosome_5kb_treatment_fst_1_Good_POST$avg_wc_fst,size=length(autosome_5kb_treatment_fst_1_Good_POST$avg_wc_fst),replace=TRUE)))
+}
+quantile(bstrap_medians,c(0.025,0.975))
+```
+### Calculate median d<sub>XY</sub>
+```{r}
+# Read in data
+autosome_5kb_treatment_dxy <- read.table("autosomes.dxy.5kb.treatment.txt", header=TRUE)
+# Remove NA values and set all negative values to zero
+autosome_5kb_treatment_dxy_1 <- subset(autosome_5kb_dxy, avg_dxy!="NaN")
+
+# Subset each target population
+autosome_5kb_treatment_dxy_1_POST_PRE <- subset(autosome_5kb_dxy_1, pop1=="Post-treatment" & pop2=="Pre-treatment")
+autosome_5kb_treatment_dxy_1_Good_PRE <- subset(autosome_5kb_dxy_1, pop1=="Good_clearers" & pop2=="Pre-treatment")
+autosome_5kb_treatment_dxy_1_Good_POST <- subset(autosome_5kb_dxy_1, pop1=="Good_clearers" & pop2=="Post-treatment")
+
+# Calculate mean and median dXY values for each treatment group (example for one comparison only)
+median(autosome_5kb_treatment_dxy_1_Good_POST$avg_dxy)
+mean(autosome_5kb_treatment_dxy_1_Good_POST$avg_dxy)
+bstrap_means <- c()
+bstrap_medians <- c()
+
+# Calculate bootstrap medians, mean and quantiles (example for one comparison only)
+for (i in 1:100) { 
+  bstrap_medians <- c(bstrap_medians,median(sample(autosome_5kb_treatment_dxy_1_Good_POST$avg_dxy,size=length(autosome_5kb_treatment_dxy_1_Good_POST$avg_dxy),replace=TRUE)))
+  bstrap_means <- c(bstrap_means,mean(sample(autosome_5kb_treatment_dxy_1_Good_POST$avg_dxy,size=length(autosome_5kb_treatment_dxy_1_Good_POST$avg_dxy),replace=TRUE)))
+}
+quantile(bstrap_medians,c(0.05,0.95))
 ```
 ## Figure 4C:  <a name="figure4c"></a>
 ```{r}
@@ -236,42 +286,3 @@ bottom_row <- plot_grid(GvsPR,GvsPO,PRvsPO,label,ERR_BIN_UNADJ,ERR_LIN_UNADJb,la
 
 plot_grid(top_row,bottom_row, axis="r", nrow = 2, rel_heights = c(0.185,0.54), align = 'v')
 ```
-
-
-
-### BSTRAP ###
-
-
-autosome_5kb_fst <- read.table("autosomes.fst.5kb.treatment.txt", header=TRUE)
-autosome_5kb_fst_1 <- subset(autosome_5kb_fst, avg_wc_fst!="NaN" & avg_wc_fst!="NA")
-autosome_5kb_fst_1[autosome_5kb_fst_1 < 0] <- 0
-autosome_5kb_fst_1_POST_PRE <- subset(autosome_5kb_fst_1, pop1=="POST" & pop2=="PRE")
-autosome_5kb_fst_1_Good_PRE <- subset(autosome_5kb_fst_1, pop1=="Good" & pop2=="PRE")
-autosome_5kb_fst_1_Good_POST <- subset(autosome_5kb_fst_1, pop1=="Good" & pop2=="POST")
-
-autosome_5kb_dxy <- read.table("autosomes.dxy.5kb.treatment.txt", header=TRUE)
-autosome_5kb_dxy_1 <- subset(autosome_5kb_dxy, avg_dxy!="NaN")
-autosome_5kb_dxy_1_POST_PRE <- subset(autosome_5kb_dxy_1, pop1=="POST" & pop2=="PRE")
-autosome_5kb_dxy_1_Good_PRE <- subset(autosome_5kb_dxy_1, pop1=="Good" & pop2=="PRE")
-autosome_5kb_dxy_1_Good_POST <- subset(autosome_5kb_dxy_1, pop1=="Good" & pop2=="POST")
-
-median(autosome_5kb_fst_1_POST_PRE$avg_wc_fst)
-mean(autosome_5kb_fst_1_POST_PRE$avg_wc_fst)
-bstrap_means <- c()
-bstrap_medians <- c()
-for (i in 1:100) { 
-  bstrap_medians <- c(bstrap_medians,median(sample(autosome_5kb_fst_1_POST_PRE$avg_wc_fst,size=length(autosome_5kb_fst_1_POST_PRE$avg_wc_fst),replace=TRUE)))
-  bstrap_means <- c(bstrap_means,mean(sample(autosome_5kb_fst_1_POST_PRE$avg_wc_fst,size=length(autosome_5kb_fst_1_POST_PRE$avg_wc_fst),replace=TRUE)))
-}
-quantile(bstrap_medians,c(0.05,0.95))
-
-median(autosome_5kb_dxy_1_POST_PRE$avg_dxy)
-mean(autosome_5kb_dxy_1_POST_PRE$avg_dxy)
-bstrap_means <- c()
-bstrap_medians <- c()
-for (i in 1:100) { 
-  bstrap_medians <- c(bstrap_medians,median(sample(autosome_5kb_dxy_1_POST_PRE$avg_dxy,size=length(autosome_5kb_dxy_1_POST_PRE$avg_dxy),replace=TRUE)))
-  bstrap_means <- c(bstrap_means,mean(sample(autosome_5kb_dxy_1_POST_PRE$avg_dxy,size=length(autosome_5kb_dxy_1_POST_PRE$avg_dxy),replace=TRUE)))
-}
-quantile(bstrap_medians,c(0.05,0.95))
-
