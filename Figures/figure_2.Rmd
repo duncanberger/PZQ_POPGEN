@@ -1,13 +1,13 @@
 # Figure 2: S. mansoni population structure in Uganda
 
 0. [Project setup](#setup)
-1. [Figure 2 A](#figure2a)
-2. [Figure 2 B](#figure2b)
-3. [Figure 2 C](#figure2c)
-4. [Figure 2 D](#figure2d)
-5. [Figure 2 E](#figure2e)
-## 00 - Project setup <a name="setup"></a>
-```R
+1. [Figure 2A](#figure2a)
+2. [Figure 2B](#figure2b)
+3. [Figure 2C](#figure2c)
+4. [Figure 2D](#figure2d)
+5. [Figure 2E](#figure2e)
+## Project setup <a name="setup"></a>
+```{r}
 # Load required packages
 library("ggplot2")
 library("reshape2")
@@ -19,7 +19,8 @@ library("ggtree")
 library("phangorn")
 # Load metadata
 key <- read.table("supplementary_table_2.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
-```R
+```
+
 ## Figure 2A: Principal component analysis <a name="figure2a"></a>
 ```R
 # Create theme
