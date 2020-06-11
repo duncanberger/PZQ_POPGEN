@@ -37,8 +37,8 @@ selection_theme <- theme(
   axis.ticks.x=element_blank())
 
 scaleFUN <- function(x) sprintf("%.1f", x)
-?selection_colors <- rep(c("grey75", "grey40","#ef3b2c"))
-?selection_colors2 <- rep(c("grey75", "grey40","#19abff"))
+selection_colors <- rep(c("grey75", "grey40","#ef3b2c"))
+selection_colors2 <- rep(c("grey75", "grey40","#19abff"))
 ```
 ## Figure 3A: iHS <a name="figure3a"></a>
 ```{r}
