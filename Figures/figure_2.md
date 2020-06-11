@@ -6,6 +6,7 @@
 3. [Figure 2C](#figure2c)
 4. [Figure 2D](#figure2d)
 5. [Figure 2E](#figure2e)
+6. [Merged figure](#figure2f)
 ## Project setup <a name="setup"></a>
 ```{r}
 # Load required packages
@@ -22,8 +23,8 @@ key <- read.table("supplementary_table_2.txt", header=TRUE, sep="\t", check.name
 ```
 
 ## Figure 2A: Principal component analysis <a name="figure2a"></a>
-```R
-# Create theme
+```{r}
+# Create a theme and palette
 PCA_theme <- theme(axis.title=element_text(face="bold",size=9),
                    panel.background=element_blank(),
                    legend.text = element_text(face="bold"),
@@ -32,6 +33,7 @@ PCA_theme <- theme(axis.title=element_text(face="bold",size=9),
                    panel.border = element_rect(color="#4c4c4c",fill=NA),
                    panel.grid=element_blank(),
                    legend.title=element_blank())
+pca_palette <- c("#56B4E9", "#009e73","#CC79A7","#E69f00")
 
 # Load data, produce in STEP X, and merge with metadata
 eigenvec <- read.delim("prunedData.eigenvec", header=TRUE, sep="\t")
@@ -63,19 +65,107 @@ pc3_pc4 <- ggplot(eigenvec_merged, aes((PC3),(PC4))) +
   geom_point(size=0.75, aes(color=school, fill=school)) +
   xlab(paste0("PC3 (",sum_eigenval[[3]],"%)")) + 
   ylab(paste0("PC4 (",sum_eigenval[[4]],"%)")) + 
-  scale_color_manual(values=c( "#56B4E9", "#009e73","#CC79A7","#E69f00"))+
-  scale_fill_manual(values=c( "#56B4E9", "#009e73","#CC79A7","#E69f00"))+
+  scale_color_manual(values=pca_palette)+
+  scale_fill_manual(values=pca_palette)+
   scale_shape_manual(values=c(21,23,22,24)) +
   scale_x_continuous(limits=c(-0.400000001,0.600000001), expand=c(0,0)) + 
   scale_y_continuous(limits=c(-0.2000000001,0.800000001), expand=c(0,0)) +
   theme_bw() + PCA_theme
+```
+## Figure 2B: Mid-point rooted neighbour-joining tree <a name="figure2b"></a>
+```{r}
+# Load distance matrix
+mdist <- as.matrix(read.table("autosomes.mdist", sep="\t", header=TRUE, row.names=1))
 
-                   
-                   
-                   
-                   
-                   
-                   
-                   
-                   
+# Neighbor-joining tree estimation
+nj_tree <- (nj(mdist))
+
+# Plot tree
+tree <- ggtree(tree.test, layout="circular", aes(color=Site)) %<+% key +
+  scale_color_manual(values=pca_palette, na.value='grey50')+
+  geom_treescale(x=0.02, color='grey50', offset = 0.8,width = 0.025)
+```
+## Figure 2C: Autosomal nucleotide diversity values <a name="figure2c"></a>
+```{r}
+# Load nucleotide diversity results
+pi_5kb_schools <- read.table("pi.school.txt", header=TRUE)
+
+# Order by school
+pi_5kb_schools$pop = factor(pi_5kb_schools$pop, levels=c('Bugoto','Bwondha','Musubi','Kocoge'))
+
+# Randomly subset dataset (for plotting)
+pi_5kb_schools_subset <- sample_n(pi_5kb_schools, 10000)
+
+# Plot figure
+pi_all_ps <- ggplot(data=pi_5kb_schools_subset, aes(x=pop, y=log10(avg_pi), fill=pop, color=pop)) + 
+  geom_point(position=position_jitterdodge(dodge.width =1,jitter.width = 0.8),alpha=0.3, size=0.0001) +
+  geom_boxplot(aes(fill=pop),outlier.alpha = 0.0,notch = TRUE, outlier.colour = "grey35", color="black", alpha=0, width=0.275) +
+  theme_bw()+
+  scale_fill_manual(values=c("#56B4E9", "#009e73","#E69f00","#CC79A7")) +
+  scale_color_manual(values=c("#56B4E9", "#009e73","#E69f00","#CC79A7")) +
+  scale_y_continuous(expand=c(0,0), limits=c(-50,50000), breaks=c(-4.0,-3.0,-2.0,-1.0)) +
+  coord_cartesian(ylim = c(-4, -1)) +
+  xlab("A") +
+  labs(y=expression(bold(-log[10]*("\U03C0")))) +
+  PCA_theme + theme(legend.position = "none") +
+  theme(legend.text = element_text(size=6.5, face = "bold"))
+```
+
+
+## Figure 2D: Pairwise comparisons of absolute (dXY) and relative (FST) differentiation <a name="figure2d"></a>
+```{r}
+```
+## Figure 2E: Admixture <a name="figure2e"></a>
+```{r}
+# Load data
+admix <- read.table("admixture_all.txt", sep="\t", header=FALSE)
+
+# Fix columns, merge with metadata and order by school
+admix_summary <- (melt(admix,id.vars = c("V1","V2")))
+admix_summary_merged <- (merge(key, admix_summary, all=TRUE, by.y = "V2", by.x='sample_ID'))
+admix_summary_merged$g_order = factor(admix_summary_merged$school, levels=c('Bugoto','Bwondha','Musubi','Kocoge'))
+
+#Plot for values of K (2-4)
+admixture2 <- ggplot(data=subset(admix_summary_merged, V1==2)) +
+  geom_bar(aes(x=sample_ID, y=as.numeric(value), fill=variable, color=variable), 
+           width=1, show.legend=F,stat="identity")  + 
+  facet_grid(.~g_order,scales="free_x", space = "free_x") + 
+  xlab("") + ylab("") +
+  scale_fill_manual(values=c("#dadaeb","#4a1486","#807dba","#4a1486","#D55E00","#f4a582","#F0E442","#016450")) +
+  scale_color_manual(values=c("#dadaeb","#4a1486","#807dba","#4a1486","#D55E00","#f4a582","#F0E442","#016450")) +
+  scale_y_continuous(expand = c(0,0)) +
+  theme_bw() + Admixture_theme
+  
+admixture3 <- ggplot(data=subset(admix_summary_merged, V1==3)) +
+  geom_bar(aes(x=sample_ID, y=as.numeric(value), fill=variable, color=variable), 
+           width=1, show.legend=F,stat="identity")  + 
+  facet_grid(.~g_order,scales="free_x", space = "free_x") + 
+  xlab("") + 
+  ylab("") +
+  scale_fill_manual(values=c("#807dba","#4a1486","#dadaeb")) +
+  scale_color_manual(values=c("#807dba","#4a1486","#dadaeb")) +
+  scale_y_continuous(expand = c(0,0)) +
+  theme_bw() + Admixture_theme
+
+admixture4 <- ggplot(data=subset(admix_summary_merged, V1==4)) +
+  geom_bar(aes(x=sample_ID, y=as.numeric(value), fill=variable, color=variable), 
+           width=1, show.legend=F,stat="identity")  + 
+  facet_grid(.~g_order,scales="free_x", space = "free_x") + 
+  xlab("") + 
+  ylab("") +
+  scale_fill_manual(values=c("#9e9ac8","#807dba","#dadaeb","#4a1486")) +
+  scale_color_manual(values=c("#9e9ac8","#807dba","#dadaeb","#4a1486")) +
+  scale_y_continuous(expand = c(0,0)) +
+  theme_bw() + Admixture_theme
+```
+## Merged figure <a name="figure2e"></a>
+```{r}
+# Merge parts of figure together
+top <-plot_grid(pc1_pc2,pc3_pc4, nrow=2, align="h", labels=c('A',''))
+top_2 <- plot_grid(top, tree, nrow=1, rel_widths =c(0.75,1),rel_heights = c(1,2), labels=c('','B'))
+middle <- plot_grid(pi_all_ps,"",nrow=1, labels=c('C','D'), rel_widths =c(0.75,1))
+middle_2 <- plot_grid(top_2,middle,nrow=2,rel_heights = c(1,0.5), labels=c('F',''))
+bottom<- plot_grid(admixture2,admixture3, admixture4, nrow=3, align="v",labels=c('E','',''))
+plot_grid(middle_2,bottom, nrow=2, align="v", rel_heights =c(0.6,0.375),  rel_widths =c(1,0.6))
+
                    
