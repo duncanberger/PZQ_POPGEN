@@ -104,7 +104,7 @@ cat pixy.SM_V7_*.5000.school_pi.txt | grep -v pop | cat pi.header - > pi.school.
 cat pixy.SM_V7_*.5000.host_pi.txt | grep -v pop | cat pi.header - > pi.host.txt # Output can be passed to supplementary_figure_5.R
 cat pixy.SM_V7_*.5000.treatment_pi.txt | grep -v pop | cat pi.header - > pi.treatment.txt # Output can be passed to figure_4.R
 cat pixy.SM_V7_*.5000.school_fst.txt | grep -v pop | cat fst.header - > fst.school.txt # Output can be passed to figure_2.R
-cat pixy.SM_V7_*.5000.school_dxy.txt | grep -v pop | cat dxy.header - > .school.txt # Output can be passed to figure_2.R
+cat pixy.SM_V7_*.5000.school_dxy.txt | grep -v pop | cat dxy.header - > dxy.school.txt # Output can be passed to figure_2.R
 cat pixy.SM_V7_*.5000.treatment_fst.txt | grep -v pop | cat fst.header - > fst.treatment.txt # Output can be passed to figure_4.R
 cat pixy.SM_V7_*.5000.treatment_dxy.txt | grep -v pop | cat dxy.header - > dxy.treatment.txt # Output can be passed to figure_4.R
 ```
