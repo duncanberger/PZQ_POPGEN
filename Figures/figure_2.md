@@ -1,13 +1,13 @@
 # Figure 2: S. mansoni population structure in Uganda
 
-0. [Project setup](#setup)
+0. [Setup](#setup)
 1. [Figure 2A](#figure2a)
 2. [Figure 2B](#figure2b)
 3. [Figure 2C](#figure2c)
 4. [Figure 2D](#figure2d)
 5. [Figure 2E](#figure2e)
 6. [Merged figure](#figure2f)
-## Project setup <a name="setup"></a>
+## Setup <a name="setup"></a>
 ```{r}
 # Load required packages
 library("ggplot2")
@@ -176,6 +176,17 @@ quantile(bstrap_medians,c(0.05,0.95))
 ```
 ## Figure 2E: Admixture <a name="figure2e"></a>
 ```{r}
+# Set theme 
+Admixture_theme <- theme(panel.grid=element_blank(), 
+                         axis.ticks.x = element_blank(),
+                         axis.text.y = element_text(face="bold", color="black"),
+                         axis.text.x = element_blank(),
+                         strip.text=element_text(face="bold"),
+                         axis.title.y=element_text(face="bold",size=9),
+                         panel.background = element_blank(),
+                         strip.background = element_blank(),
+                         panel.border = element_rect(color="black",fill=NA))
+
 # Load data
 admix <- read.table("admixture_all.txt", sep="\t", header=FALSE)
 
@@ -226,5 +237,3 @@ middle <- plot_grid(pi_all_ps,"",nrow=1, labels=c('C','D'), rel_widths =c(0.75,1
 middle_2 <- plot_grid(top_2,middle,nrow=2,rel_heights = c(1,0.5), labels=c('F',''))
 bottom<- plot_grid(admixture2,admixture3, admixture4, nrow=3, align="v",labels=c('E','',''))
 plot_grid(middle_2,bottom, nrow=2, align="v", rel_heights =c(0.6,0.375),  rel_widths =c(1,0.6))
-
-                   
