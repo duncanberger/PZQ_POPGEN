@@ -18,10 +18,10 @@ library("SNPRelate")
 library("ape")
 library("ggtree")
 library("phangorn")
+
 # Load metadata
 key <- read.table("supplementary_table_2.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
 ```
-
 ## Figure 2A: Principal component analysis <a name="figure2a"></a>
 ```{r}
 # Create a theme and palette
@@ -110,10 +110,69 @@ pi_all_ps <- ggplot(data=pi_5kb_schools_subset, aes(x=pop, y=log10(avg_pi), fill
   PCA_theme + theme(legend.position = "none") +
   theme(legend.text = element_text(size=6.5, face = "bold"))
 ```
-
-
 ## Figure 2D: Pairwise comparisons of absolute (dXY) and relative (FST) differentiation <a name="figure2d"></a>
+### Calculate F<sub>ST</sub> estimates between each population
 ```{r}
+# Load FST scores for all pairwise comparisons between schools
+autosome_5kb_school_fst <- read.table("fst.school.txt", header=TRUE)
+
+# Remove NA values and convert all negative values to 0
+autosome_5kb_school_fst_1 <- subset(autosome_5kb_school_fst, avg_wc_fst!="NaN" & avg_wc_fst!="NA")
+autosome_5kb_school_fst_1[autosome_5kb_school_fst_1 < 0] <- 0
+
+# Subset for each combination (currently tediously hard coded, might address later)
+autosome_5kb_school_fst_1_Bugoto_Kocoge <- subset(autosome_5kb_school_fst_1, pop1=="Bugoto" & pop2=="Kocoge")
+autosome_5kb_school_fst_1_Bwondha_Kocoge <- subset(autosome_5kb_school_fst_1, pop2=="Bwondha" & pop1=="Kocoge")
+autosome_5kb_school_fst_1_Musubi_Kocoge <- subset(autosome_5kb_school_fst_1, pop1=="Musubi" & pop2=="Kocoge")
+autosome_5kb_school_fst_1_Musubi_Bugoto <- subset(autosome_5kb_school_fst_1, pop1=="Musubi" & pop2=="Bugoto")
+autosome_5kb_school_fst_1_Musubi_Bwondha <- subset(autosome_5kb_school_fst_1, pop1=="Musubi" & pop2=="Bwondha")
+autosome_5kb_school_fst_1_Bugoto_Bwondha <- subset(autosome_5kb_school_fst_1, pop1=="Bugoto" & pop2=="Bwondha")
+
+# Calculate mean and median (example for one comparison only)
+median(autosome_5kb_school_fst_1_Bugoto_Bwondha$avg_wc_fst)
+mean(autosome_5kb_school_fst_1_Bugoto_Bwondha$avg_wc_fst)
+bstrap_means <- c()
+bstrap_medians <- c()
+
+# Calculate bootstrap medians, mean and quantiles (example for one comparison only)
+for (i in 1:100) { 
+  bstrap_medians <- c(bstrap_medians,median(sample(autosome_5kb_school_fst_1_Bugoto_Bwondha$avg_wc_fst,size=length(autosome_5kb_school_fst_1_Bugoto_Bwondha$avg_wc_fst),replace=TRUE)))
+  bstrap_means <- c(bstrap_means,mean(sample(autosome_5kb_school_fst_1_Bugoto_Bwondha$avg_wc_fst,size=length(autosome_5kb_school_fst_1_Bugoto_Bwondha$avg_wc_fst),replace=TRUE)))
+}
+quantile(bstrap_medians,c(0.025,0.975))
+```
+### Calculate d<sub>XY</sub> estimates between each population
+```{r}
+# Load dXY scores for all pairwise comparisons between schools
+autosome_5kb_schools_dxy <- read.table("dxy.school.txt", header=TRUE)
+
+# Remove NA values
+autosome_5kb_schools_dxy_1 <- subset(autosome_5kb_schools, avg_dxy!="NaN")
+
+# Subset for each combination (currently tediously hard coded, might address later)
+
+
+autosome_5kb_schools_dxy_1_Bugoto_Kocoge <- subset(autosome_5kb_schools_dxy_1, pop1=="Bugoto" & pop2=="Kocoge")
+autosome_5kb_schools_dxy_1_Bwondha_Kocoge <- subset(autosome_5kb_schools_dxy_1, pop2=="Bwondha" & pop1=="Kocoge")
+autosome_5kb_schools_dxy_1_Musubi_Kocoge <- subset(autosome_5kb_schools_dxy_1, pop1=="Musubi" & pop2=="Kocoge")
+autosome_5kb_schools_dxy_1_Musubi_Bugoto <- subset(autosome_5kb_schools_dxy_1, pop1=="Musubi" & pop2=="Bugoto")
+autosome_5kb_schools_dxy_1_Musubi_Bwondha <- subset(autosome_5kb_schools_dxy_1, pop1=="Musubi" & pop2=="Bwondha")
+autosome_5kb_schools_dxy_1_Bugoto_Bwondha <- subset(autosome_5kb_schools_dxy_1, pop1=="Bugoto" & pop2=="Bwondha")
+
+# Calculate mean and median (example for one comparison only)
+median(autosome_5kb_schools_dxy_1_Bugoto_Bwondha$avg_dxy)
+mean(autosome_5kb_schools_dxy_1_Bugoto_Bwondha$avg_dxy)
+bstrap_means <- c()
+bstrap_medians <- c()
+
+# Calculate bootstrap medians, mean and quantiles (example for one comparison only)
+for (i in 1:100) { 
+  bstrap_medians <- c(bstrap_medians,median(sample(autosome_5kb_schools_dxy_1_Bugoto_Bwondha$avg_dxy,size=length(autosome_5kb_schools_dxy_1_Bugoto_Bwondha$avg_dxy),replace=TRUE)))
+  bstrap_means <- c(bstrap_means,mean(sample(autosome_5kb_schools_dxy_1_Bugoto_Bwondha$avg_dxy,size=length(aautosome_5kb_schools_dxy_1_Bugoto_Bwondha$avg_dxy),replace=TRUE)))
+}
+quantile(bstrap_medians,c(0.05,0.95))
+
+# At present these values need to be manually added to figure, as ggplot/cowplot don't combine well with tables. 
 ```
 ## Figure 2E: Admixture <a name="figure2e"></a>
 ```{r}
@@ -158,7 +217,7 @@ admixture4 <- ggplot(data=subset(admix_summary_merged, V1==4)) +
   scale_y_continuous(expand = c(0,0)) +
   theme_bw() + Admixture_theme
 ```
-## Merged figure <a name="figure2e"></a>
+## Merged figure <a name="figure2f"></a>
 ```{r}
 # Merge parts of figure together
 top <-plot_grid(pc1_pc2,pc3_pc4, nrow=2, align="h", labels=c('A',''))
