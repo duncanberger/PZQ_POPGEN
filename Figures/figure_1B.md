@@ -1,22 +1,33 @@
+# Figure 1B: sample summary.
+```{r}
+# Load packages
 library(dplyr)
-reshape2 ggplot
+library(ggplot2)
+library(reshape2)
 
-pid <- read.table("p_id.csv", sep=",", header=TRUE)
+# Load data
 pid <- read.table("supplementary_table_1.txt", sep="\t", header=TRUE)
 
-pid_2 <- pid %>%
-  select('patient_ID','School','mean_post.treatment_posterior_egg_reduction_rate','pre.treatment_miracidia_sequenced_passed_qc','post.treatment_miracidia_sequenced_passed_qc')
+# Create color palette
+pca_palette <- c("#56B4E9", "#009e73","#E69f00","#CC79A7")
 
+#Select columns of interest
+pid_2 <- pid %>% select('patient_ID','School','mean_post.treatment_posterior_egg_reduction_rate','pre.treatment_miracidia_sequenced_passed_qc','post.treatment_miracidia_sequenced_passed_qc')
+
+# Convert table to ggplot friendly format
 pid_2_melt <- melt(pid_2,id.vars = c("patient_ID","mean_post.treatment_posterior_egg_reduction_rate","School"), measure.vars=c("pre.treatment_miracidia_sequenced_passed_qc","post.treatment_miracidia_sequenced_passed_qc"))
+
+# Convert pre- and post-treatment numbers to numerical format
 pid_2_melt$variable <- ifelse(pid_2_melt$variable == "pre.treatment_miracidia_sequenced_passed_qc", "0", "27")
 
+# Slightly jitter the points so they plot better
 pid_2_melt$N_jit <- jitter(pid_2_melt$value, factor=0.5)
 pid_2_melt$Days_jit <- jitter(as.numeric(pid_2_melt$variable), factor=0.5)
 
-pca_palette <- c("#56B4E9", "#009e73","#E69f00","#CC79A7")
+# Order by school
 pid$School = factor(pid$School, levels=c('Bugoto','Bwondha','Musubi','Kocoge'))
 
-
+# Plot
 ggplot(data=subset(pid_2_melt, value!=0), aes(x=Days_jit, group=patient_ID, y=value)) + 
   geom_line(aes(group=patient_ID), alpha=0.6) +
   geom_point(aes(size=value, fill=School), alpha=0.6,color="black",pch=21) +
@@ -34,3 +45,4 @@ ggplot(data=subset(pid_2_melt, value!=0), aes(x=Days_jit, group=patient_ID, y=va
                      panel.border = element_rect(color="#4c4c4c",fill=NA),
                      panel.grid=element_blank(),
                      legend.title=element_blank())
+```
