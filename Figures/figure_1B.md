@@ -1,4 +1,4 @@
-# Figure 1B: sample summary.
+# Figure 1B: Sample summary.
 ```{r}
 # Load packages
 library(dplyr)
