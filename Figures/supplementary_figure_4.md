@@ -36,7 +36,7 @@ sum_eigenval<-lapply(eigenval$V1,function(x){
 ### Plot supplementary figure 4A
 ```{r}
 # Plot first two principal components, color points by host
-pc1_pc2 <- ggplot(eigenvec_merged, aes((PC1),(PC2))) + 
+sfig_4_A1 <- ggplot(eigenvec_merged, aes((PC1),(PC2))) + 
   geom_point(size=0.75, aes(color=patient_id, fill=patient_id)) +
   xlab(paste0("PC1 (",sum_eigenval[[1]],"%)")) + 
   ylab(paste0("PC2 (",sum_eigenval[[2]],"%)")) + 
@@ -46,7 +46,7 @@ pc1_pc2 <- ggplot(eigenvec_merged, aes((PC1),(PC2))) +
   theme_bw() + PCA_theme 
 
 # Plot first third and fourth principal components, color points by host
-pc3_pc4 <- ggplot(eigenvec_merged, aes((PC3),(PC4))) + 
+sfig_4_A2 <- ggplot(eigenvec_merged, aes((PC3),(PC4))) + 
   geom_point(size=0.75, aes(color=patient_id, fill=patient_id)) +
   xlab(paste0("PC3 (",sum_eigenval[[3]],"%)")) + 
   ylab(paste0("PC4 (",sum_eigenval[[4]],"%)")) + 
@@ -60,7 +60,7 @@ pc3_pc4 <- ggplot(eigenvec_merged, aes((PC3),(PC4))) +
 ### Plot supplementary figure 4B
 ```{r}
 # Plot first two principal components, color points by sampling point
-pc1_pc2 <- ggplot(eigenvec_merged, aes((PC1),(PC2))) + 
+sfig_4_B1 <- ggplot(eigenvec_merged, aes((PC1),(PC2))) + 
   geom_point(size=0.75, aes(color=sample_point, fill=sample_point)) +
   xlab(paste0("PC1 (",sum_eigenval[[1]],"%)")) + 
   ylab(paste0("PC2 (",sum_eigenval[[2]],"%)")) + 
@@ -72,7 +72,7 @@ pc1_pc2 <- ggplot(eigenvec_merged, aes((PC1),(PC2))) +
   theme_bw() + PCA_theme 
 
 # Plot first third and fourth principal components, color points by sampling point
-pc3_pc4 <- ggplot(eigenvec_merged, aes((PC3),(PC4))) + 
+sfig_4_B2 <- ggplot(eigenvec_merged, aes((PC3),(PC4))) + 
   geom_point(size=0.75, aes(color=sample_point, fill=sample_point)) +
   xlab(paste0("PC3 (",sum_eigenval[[3]],"%)")) + 
   ylab(paste0("PC4 (",sum_eigenval[[4]],"%)")) + 
@@ -82,4 +82,9 @@ pc3_pc4 <- ggplot(eigenvec_merged, aes((PC3),(PC4))) +
   scale_x_continuous(limits=c(-0.400000001,0.600000001), expand=c(0,0)) + 
   scale_y_continuous(limits=c(-0.2000000001,0.800000001), expand=c(0,0)) +
   theme_bw() + PCA_theme
+```
+### Merge
+```{r}
+# Merge figures
+plot_grid(sfig_4_A1,sfig_4_A2,sfig_4_B1,sfig_4_B2, ncol=2, nrow=2, rel_widths=c(1,1), rel_heights = c(1,0.6)) + 
 ```
