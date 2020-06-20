@@ -117,7 +117,7 @@ pi_all_ps <- ggplot(data=pi_5kb_schools_subset, aes(x=pop, y=log10(avg_pi), fill
 autosome_5kb_school_fst <- read.table("fst.school.txt", header=TRUE)
 
 # Remove NA values and convert all negative values to 0
-autosome_5kb_school_fst_1 <- subset(autosome_5kb_school_fst, avg_wc_fst!="NaN" & avg_wc_fst!="NA")
+autosome_5kb_school_fst_1 <- subset(autosome_5kb_school_fst, avg_wc_fst!="NaN" & avg_wc_fst!="NA" & no_snps>125)
 autosome_5kb_school_fst_1[autosome_5kb_school_fst_1 < 0] <- 0
 
 # Subset for each combination (currently tediously hard coded, might address later)
@@ -147,7 +147,7 @@ quantile(bstrap_medians,c(0.025,0.975))
 autosome_5kb_schools_dxy <- read.table("dxy.school.txt", header=TRUE)
 
 # Remove NA values
-autosome_5kb_schools_dxy_1 <- subset(autosome_5kb_schools, avg_dxy!="NaN")
+autosome_5kb_schools_dxy_1 <- subset(autosome_5kb_schools, avg_dxy!="NaN" & no_snps>125)
 
 # Subset for each combination (currently tediously hard coded, might address later)
 
