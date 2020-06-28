@@ -71,6 +71,11 @@ gatk MarkDuplicates --INPUT PZQ_popgen6472766.bam --OUTPUT PZQ_popgen6472766.mar
 # Index all BAM files
 parallel -j1 --colsep '\t' "samtools index {1}" <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 ```
+### Calculate coverage
+```
+# Calculate per-sample coverage
+INSERT METHOD HERE
+```
 ## 04 - Variant calling <a name="variantcalling"></a>
 
 ### Per-sampling variant calling
