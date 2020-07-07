@@ -62,7 +62,7 @@ bwa mem -t 6 ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa ERR3173238_1.fastq.gz E
 ```
 ### Mark PCR duplicates
 ```
-parallel --dry-run --colsep '\t' "gatk MarkDuplicates --INPUT {1}.bam --OUTPUT {1}.markdup.bam --METRICS_FILE {1}.metrics.txt" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+parallel --dry-run --colsep '\t' "gatk MarkDuplicates --INPUT {1}.bam --OUTPUT {1}.markdup.bam --METRICS_FILE {1}.metrics.txt" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz" | cut -f1)
 ```
 The parallel command will write each markduplicate command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. For example:
 ```
@@ -80,8 +80,11 @@ cut -f1,2 ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa.fai > Sm_v7_nohap.txt
 bedtools makewindows -g Sm_v7_nohap.txt -w 25000 > Sm_v7_nohap.25kb.bed
 
 # Calculate per-sample coverage
-parallel "coverageBed -a Sm_v7_nohap.25kb.bed -b {}.markdup.bam > {}.cov" :::: samples.list
+parallel "coverageBed -a Sm_v7_nohap.25kb.bed -b {1}.markdup.bam > {1}.cov" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 
+# Name and merge output
+parallel "awk '{print \$1,\$2,\$3,\$4,FILENAME}' {1}.cov | sed 's/.cov//g' > {1}.renamed.cov" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+cat *.renamed.cov > all.renamed.cov
 # Output can be passed to supplementary_figure_3.R
 ```
 ## 04 - Variant calling <a name="variantcalling"></a>
@@ -163,7 +166,6 @@ gatk SelectVariants -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant mer
 ```
 gatk MergeVcfs --INPUT merged_all_samples.SNPs.filtered.vcf --INPUT merged_all_samples.indels_mixed.filtered.vcf --OUTPUT merged_all_samples.filtered.vcf
 ```
-
 ### Remove low-quality samples and variants 
 ```
 # Calculate per-individual missingness rate 
