@@ -30,7 +30,7 @@ pid$School = factor(pid$School, levels=c('Bugoto','Bwondha','Musubi','Kocoge'))
 # Plot
 ggplot(data=subset(pid_2_melt, value!=0), aes(x=Days_jit, group=patient_ID, y=value)) + 
   geom_line(aes(group=patient_ID), alpha=0.6) +
-  geom_point(aes(size=value, fill=School), alpha=0.6,color="black",pch=21) +
+  geom_point(aes(fill=School), alpha=0.6,color="black",pch=21, size=4) +
   facet_grid(cols=vars(School),scales="free_y", space = "free_y") +
   scale_x_continuous(breaks=c(0,27)) +
   scale_y_continuous(breaks=c(0,1,2,3,4,5,6,7,8,9), limits=c(0,9), expand=c(0,0))+
