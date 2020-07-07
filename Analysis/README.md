@@ -154,14 +154,25 @@ parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.
 vcftools --vcf PZQ_POPGEN.biallelic.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.SM_V7_1.vcf --chr SM_V7_1
 vcftools --vcf PZQ_POPGEN.biallelic.vcf --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.SM_V7_2.vcf --chr SM_V7_2
 ```
+### Create genetic maps
+```
+# Produce a list of variant sites
+bcftools query -f '%CHROM\t%POS\n' PZQ_POPGEN.biallelic.vcf > PZQ_POPGEN.biallelic.txt
+
+# Produce an approximate genetic map for each chromosome (using a per-chromosome recombination rate estimates). Commands vary depending on location of first variant ('$2-2389' etc.)
+awk '{$3=((($2-2389)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_1" PZQ_POPGEN.biallelic.txt) > SM_V7_1.gmap
+awk '{$3=((($2-7397)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_2" PZQ_POPGEN.biallelic.txt) > SM_V7_2.gmap
+awk '{$3=((($2-19901)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_3" PZQ_POPGEN.biallelic.txt) > SM_V7_3.gmap
+awk '{$3=((($2-1216)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_4" PZQ_POPGEN.biallelic.txt) > SM_V7_4.gmap
+awk '{$3=((($2-14768)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_5" PZQ_POPGEN.biallelic.txt) > SM_V7_5.gmap
+awk '{$3=((($2-51031)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_6" PZQ_POPGEN.biallelic.txt) > SM_V7_6.gmap
+awk '{$3=((($2-19246)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_7" PZQ_POPGEN.biallelic.txt) > SM_V7_7.gmap
+awk '{$3=((($2-1972)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_ZW" PZQ_POPGEN.biallelic.txt) > SM_V7_ZW.gmap
+```
 ### Statistically phase variants using BEAGLE
 ```
 # Phase variants for each vcf file using BEAGLE
 parallel --dry-run "java -jar beagle.28Sep18.793.jar gt=PZQ_POPGEN.biallelic.{}.vcf out=PZQ_POPGEN.biallelic.{}.beagle map={}.gmap nthreads=4 iterations=100 burnin=10 ne=65000" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
-```
-### Create genetic maps
-```
-INSERT METHOD HERE
 ```
 ### Produce subsets for each population
 ```
