@@ -69,12 +69,20 @@ The parallel command will write each markduplicate command to screen, which can 
 gatk MarkDuplicates --INPUT PZQ_popgen6472766.bam --OUTPUT PZQ_popgen6472766.markdup.bam --METRICS_FILE PZQ_popgen6472766.metrics.txt
 
 # Index all BAM files
-parallel -j1 --colsep '\t' "samtools index {1}" <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+parallel -j1 --colsep '\t' "samtools index {1}.markdup.bam" <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 ```
 ### Calculate coverage
 ```
+# Create makewindows input
+cut -f1,2 ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa.fai > Sm_v7_nohap.txt
+
+# Create 25 kb windows
+bedtools makewindows -g Sm_v7_nohap.txt -w 25000 > Sm_v7_nohap.25kb.bed
+
 # Calculate per-sample coverage
-INSERT METHOD HERE
+parallel "coverageBed -a Sm_v7_nohap.25kb.bed -b {}.markdup.bam > {}.cov" :::: samples.list
+
+# Output can be passed to supplementary_figure_3.R
 ```
 ## 04 - Variant calling <a name="variantcalling"></a>
 
@@ -151,7 +159,6 @@ gatk SelectVariants -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant mer
 # Remove low-quality sites
 gatk SelectVariants -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --variant merged_all_samples.indels_mixed.tagged.vcf --exclude-filtered --output merged_all_samples.indels_mixed.filtered.vcf
 ```
-
 ### Recombine filtered variants
 ```
 gatk MergeVcfs --INPUT merged_all_samples.SNPs.filtered.vcf --INPUT merged_all_samples.indels_mixed.filtered.vcf --OUTPUT merged_all_samples.filtered.vcf
