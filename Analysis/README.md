@@ -160,14 +160,14 @@ vcftools --vcf PZQ_POPGEN.biallelic.vcf --recode --recode-INFO-all --out PZQ_POP
 bcftools query -f '%CHROM\t%POS\n' PZQ_POPGEN.biallelic.vcf > PZQ_POPGEN.biallelic.txt
 
 # Produce an approximate genetic map for each chromosome (using a per-chromosome recombination rate estimates). Commands vary depending on location of first variant ('$2-2389' etc.)
-awk '{$3=((($2-2389)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_1" PZQ_POPGEN.biallelic.txt) > SM_V7_1.gmap
+awk '{$3=((($2-2389)*3.509)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_1" PZQ_POPGEN.biallelic.txt) > SM_V7_1.gmap
 awk '{$3=((($2-7397)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_2" PZQ_POPGEN.biallelic.txt) > SM_V7_2.gmap
-awk '{$3=((($2-19901)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_3" PZQ_POPGEN.biallelic.txt) > SM_V7_3.gmap
-awk '{$3=((($2-1216)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_4" PZQ_POPGEN.biallelic.txt) > SM_V7_4.gmap
-awk '{$3=((($2-14768)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_5" PZQ_POPGEN.biallelic.txt) > SM_V7_5.gmap
-awk '{$3=((($2-51031)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_6" PZQ_POPGEN.biallelic.txt) > SM_V7_6.gmap
-awk '{$3=((($2-19246)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_7" PZQ_POPGEN.biallelic.txt) > SM_V7_7.gmap
-awk '{$3=((($2-1972)*4.975)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_ZW" PZQ_POPGEN.biallelic.txt) > SM_V7_ZW.gmap
+awk '{$3=((($2-19901)*3.236)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_3" PZQ_POPGEN.biallelic.txt) > SM_V7_3.gmap
+awk '{$3=((($2-1216)*4.103)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_4" PZQ_POPGEN.biallelic.txt) > SM_V7_4.gmap
+awk '{$3=((($2-14768)*3.910)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_5" PZQ_POPGEN.biallelic.txt) > SM_V7_5.gmap
+awk '{$3=((($2-51031)*4.623)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_6" PZQ_POPGEN.biallelic.txt) > SM_V7_6.gmap
+awk '{$3=((($2-19246)*5.979)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_7" PZQ_POPGEN.biallelic.txt) > SM_V7_7.gmap
+awk '{$3=((($2-1972)*4.031)/1000000)}{print $1,".",$3,$2}' <(grep "SM_V7_ZW" PZQ_POPGEN.biallelic.txt) > SM_V7_ZW.gmap
 ```
 ### Statistically phase variants using BEAGLE
 ```
