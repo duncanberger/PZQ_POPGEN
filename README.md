@@ -4,8 +4,8 @@ This repository contains the data and the analysis workflow for the manuscript "
 
 The repository is divided into 3 sections:
 
-1). Production - containing all the commands used to produce the data for the analyses.<br />
-2). Analysis - containing all the commands used to analyse the data.<br />
+1). Production - containing all the commands used to produce data for analyses.<br />
+2). Analysis - containing all the commands used to analyse data.<br />
 3). Figures - containing scripts (1 script per figure) used to plot the results. <br />
 ## Abstract
 
