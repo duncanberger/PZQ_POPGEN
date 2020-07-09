@@ -110,7 +110,7 @@ pi_all_ps <- ggplot(data=pi_5kb_schools_subset, aes(x=pop, y=log10(avg_pi), fill
   PCA_theme + theme(legend.position = "none") +
   theme(legend.text = element_text(size=6.5, face = "bold"))
 ```
-## Figure 2D: Pairwise comparisons of absolute (dXY) and relative (FST) differentiation <a name="figure2d"></a>
+## Figure 2D: Pairwise comparisons of absolute (d<sub>XY</sub>) and relative (F<sub>ST</sub>) differentiation <a name="figure2d"></a>
 ### Calculate F<sub>ST</sub> estimates between each population
 ```{r}
 # Load FST scores for all pairwise comparisons between schools
