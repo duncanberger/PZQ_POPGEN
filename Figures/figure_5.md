@@ -1,4 +1,4 @@
-# Figure 4: Impact of a single-round of praziquantel treatment on the Mayuge district Schistosoma mansoni populations
+# Figure 6: Impact of a single-round of praziquantel treatment on the Mayuge district Schistosoma mansoni populations
 
 0. [Setup](#setup)
 1. [Figure 4A](#figure4a)
@@ -22,7 +22,7 @@ key <- read.table("supplementary_table_2.txt", header=TRUE, sep="\t", check.name
 scaleFUN <- function(x) sprintf("%.1f", x)
 
 ```
-## Figure 4A: Nucleotide diversity estimates <a name="figure4a"></a>
+## Figure 5A: Nucleotide diversity estimates <a name="figure4a"></a>
 ```{r}
 #Create theme
 pi_theme <- theme(panel.grid.major = element_blank(),
@@ -62,7 +62,7 @@ pi_all <- ggplot(data=treatment_5kb_pi_2, aes(x=pop, y=log10(avg_pi), fill=pop, 
   theme(legend.text = element_text(size=6.5, face = "bold"),
         axis.text = element_text(color = "black"))
 ```
-## Figure 4B:  <a name="figure4b"></a>
+## Figure 5B:  <a name="figure4b"></a>
 ### Calculate median F<sub>ST</sub> 
 ```{r}
 # Read in data
@@ -115,7 +115,7 @@ for (i in 1:100) {
 }
 quantile(bstrap_medians,c(0.05,0.95))
 ```
-## Figure 4C:  <a name="figure4c"></a>
+## Figure 5C:  <a name="figure4c"></a>
 ```{r}
 # Create plot theme
 fst_theme <- theme(legend.position="none",panel.grid = element_blank(),
@@ -184,7 +184,7 @@ label <- ggplot(subset(fst_treatment_25kb pop1=="Post-treatment" & pop2=="Pre-tr
   labs(y=expression(bold("Weighted "*F[ST])))+
   fst_theme
 ```
-## Figure 4D: Logistic regression genome-wide association test <a name="figure4d"></a>
+## Figure 5D: Logistic regression genome-wide association test <a name="figure4d"></a>
 ```{r}
 # Create theme
 err_theme <- theme(legend.title = element_blank(),
@@ -235,7 +235,7 @@ ERR_BIN_UNADJ <- ggplot(assoc_BIN_ALL2, aes(x=as.numeric(ID), y=-log10(as.numeri
   fst_theme +
   theme(axis.text.x = element_blank())
 ```
-## Figure 4E: Linear regression genome-wide association test  <a name="figure4e"></a>
+## Figure 5E: Linear regression genome-wide association test  <a name="figure4e"></a>
 ```{r}
 # Read in data
 assoc_ERR_ALL <- read.table("ERR_linear_covar4_mayuge_maf.linear.adjusted.tbl", header=TRUE, sep='\t')
