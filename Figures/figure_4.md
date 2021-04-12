@@ -40,98 +40,116 @@ scaleFUN <- function(x) sprintf("%.1f", x)
 selection_colors <- rep(c("grey75", "grey40","#ef3b2c"))
 selection_colors2 <- rep(c("grey75", "grey40","#19abff"))
 ```
-## Figure 4A: iHS <a name="figure3a"></a>
+## Figure 4A: Mayuge iHS <a name="figure4a"></a>
 ```{r}
 # Read in data
-ihs_noko <- read.table("mayuge.ihs.out.100bins.norm.all")
+#ihs_noko <- read.table("mayuge.ihs.out.100bins.norm.all")
+ihs_noko <- read.table("ALL.MAYUGE.IHS.ihs.out.100bins.norm.fixed") #remove
 
 #Create windows based on site locations
-ihs_noko$START <- (RoundTo(ihs_noko$V3, multiple = 25000, FUN = floor)+1)
-ihs_noko$STOP <- (RoundTo(ihs_noko$V3, multiple = 25000, FUN = ceiling))
+ihs_noko$START <- (RoundTo(ihs_noko$V3, multiple = 2000, FUN = floor)+1)
+ihs_noko$STOP <- (RoundTo(ihs_noko$V3, multiple = 2000, FUN = ceiling))
 
 # Calculate median iHS scores for each window and calculate number of variants per window
 ihs_noko_median <- aggregate((abs(V8))~V1+START, ihs_noko, median)
 ihs_noko_length <- aggregate((abs(V8))~V1+START, ihs_noko, FUN=length)
 
 # Merge median iHS and variant counts per window 
-ihs_noko_summary <- merge(ihs_noko_median, ihs_noko_length, by.x = c("V1","START"), by.y = c("V1","START"))
+ihs_noko_summary0 <- merge(ihs_noko_median, ihs_noko_length, by.x = c("V1","START"), by.y = c("V1","START"))
+names(ihs_noko_summary0) <- c("CHROM", "BIN_START","MEDIAN_ihs_noko", "N_VARIANTS_ihs_noko")
 
-# Rename table headers
-names(ihs_noko_summary) <- c("CHROM", "BIN_START","MEDIAN_ihs_noko", "N_VARIANTS_ihs_noko")
+# Merge window bed file (in case of missing windows)
+ihs_noko_summary1 <- merge(ihs_noko_summary0, windows, by.x = c("CHROM","BIN_START"), by.y = c("CHROM","BIN_START"), all.x = TRUE, all.y = TRUE)
 
-# Identify highest 0.5% of median iHS scores
-tp_subset <- ihs_noko_summary[ihs_noko_summary$MEDIAN_ihs_noko >= quantile(ihs_noko_summary$MEDIAN_ihs_noko,.9950),]
+# Order windows and create x-axis coordinates
+ihs_noko_summary1<- ihs_noko_summary1[order(ihs_noko_summary1$CHROM, ihs_noko_summary1$BIN_START),]
+ihs_noko_summary1$ID <- seq.int(nrow(ihs_noko_summary1))
+
+# Remove windows with less than 20 variants per window
+ihs_noko_summary <- subset(ihs_noko_summary1, SNP_COUNT>=20)
+
+# Identify highest 0.25% of median iHS scores and set a cutoff
+tp_subset <- ihs_noko_summary[ihs_noko_summary$MEDIAN_ihs_noko >= quantile(ihs_noko_summary$MEDIAN_ihs_noko,.9975, na.rm = TRUE),]
 ihsnoko_cutoff <- as.numeric(head(tp_subset[order(tp_subset$MEDIAN_ihs_noko),],1)[3])
 
-# Group windows into 3 categories based on chromosome number and whether windows fall into highest 0.5% of values
+# Group windows into 3 categories based on chromosome number and whether windows fall into highest 0.25% of values
 ihs_noko_summary$COLOR_ihs_noko <- ihs_noko_summary$CHROM
 ihs_noko_summary$COLOR_ihs_noko <- ifelse(ihs_noko_summary$CHROM == 1,"A",
                                           ifelse(ihs_noko_summary$CHROM == 3,"A",
                                                  ifelse(ihs_noko_summary$CHROM == 5,"A",
                                                         ifelse(ihs_noko_summary$CHROM == 7,"A", no="B"))))
-ihs_noko_summary$COLOR_ihs_noko[ihs_noko_summary$MEDIAN_ihs_noko>(ihsnoko_cutoff)] <- "TP"
+
+# Subset and group regions of selection and combine into a final table
+test <- subset(ihs_noko_summary, MEDIAN_ihs_noko>ihsnoko_cutoff) %>% 
+  group_by(CHROM, grp = cumsum(c(1, diff(BIN_START) > 300000))) %>% 
+  filter(n() > 4) %>% select(CHROM,BIN_START)
+aggregate(test$BIN_START, by = list(test$grp, test$CHROM), max)
+test$COLOR_ihs_noko <- "SELEC"
+ihs_noko_summary_2 <- merge(ihs_noko_summary, test, by.x = c("CHROM","BIN_START"), by.y = c("CHROM","BIN_START"), all.x = TRUE, all.y = TRUE)
+ihs_noko_summary_2$mycol <- coalesce(ihs_noko_summary_2$COLOR_ihs_noko.y, ihs_noko_summary_2$COLOR_ihs_noko.x)
+
+# Set axis labels for windows
+axisdf = ihs_noko_summary_2 %>% group_by(CHROM) %>% summarize(center=( max(ID) + min(ID) ) / 2 )
+
+MAYUGE_IHS <- ggplot(subset(ihs_noko_summary_2,SNP_COUNT>=20), aes(x=ID, y=abs(MEDIAN_ihs_noko))) +
+  geom_point( aes(color=as.factor(mycol)),size=0.0001) +
+  ylab("Median | iHS |") +
+  scale_color_manual(values = selection_colors) +
+  scale_x_continuous( label = axisdf$CHROM, breaks= axisdf$center, expand=c(0,0)) +
+  scale_y_continuous(expand=c(0,0), limits=c(0,6), breaks=c(0.0,3,6.0)) +
+  theme_bw() +
+  selection_theme
 ```
-## Figure 4B: CLR <a name="figure3b"></a>
+## Figure 4B: Tororo iHS <a name="figure4b"></a>
 ```{r}
-# Read in data
-clr_MAYUGE <- read.table("all.mayuge.swd", header=FALSE)
+# Import data
+ihs_ko <- read.table("ALL.TORORO.IHS.ihs.out.100bins.norm.fixed")
 
 #Create windows based on site locations
-clr_MAYUGE$START <- (RoundTo(clr_MAYUGE$V1, multiple = 25000, FUN = floor)+1)
-clr_MAYUGE$STOP <- (RoundTo(clr_MAYUGE$V1, multiple = 25000, FUN = ceiling))
+ihs_ko$START <- (RoundTo(ihs_ko$V3, multiple = 2000, FUN = floor)+1)
+ihs_ko$STOP <- (RoundTo(ihs_ko$V3, multiple = 2000, FUN = ceiling))
+
+# Calculate median iHS scores for each window and calculate number of variants per window
+ihs_ko_median <- aggregate((abs(V8))~V1+START, ihs_ko, median)
+ihs_ko_length <- aggregate((abs(V8))~V1+START, ihs_ko, FUN=length)
 
 # Merge median iHS and variant counts per window 
-clr_MAYUGE_median <- aggregate((V2)~V4+START, clr_MAYUGE, median)
-clr_MAYUGE_length <- aggregate((V2)~V4+START, clr_MAYUGE, FUN=length)
+ihs_ko_summary0 <- merge(ihs_ko_median, ihs_ko_length, by.x = c("V1","START"), by.y = c("V1","START"))
+names(ihs_ko_summary0) <- c("CHROM", "BIN_START","MEDIAN_ihs_ko", "N_VARIANTS_ihs_ko")
 
-# Merge median CLR and variant counts per window 
-clr_MAYUGE_summary <- merge(clr_MAYUGE_median, clr_MAYUGE_length, by.x = c("V4","START"), by.y = c("V4","START"))
+# Merge window bed file (in case of missing windows)
+ihs_ko_summary7 <- merge(ihs_ko_summary0, windows, by.x = c("CHROM","BIN_START"), by.y = c("CHROM","BIN_START"), all.x = TRUE, all.y = TRUE)
 
-# Rename table headers
-names(clr_MAYUGE_summary) <- c("CHROM", "BIN_START","MEDIAN_clr_MAYUGE", "N_WIN_clr_MAYUGE")
+# Order windows and create x-axis coordinates
+ihs_ko_summary7<- ihs_ko_summary7[order(ihs_ko_summary7$CHROM, ihs_ko_summary7$BIN_START),]
+ihs_ko_summary7$ID <- seq.int(nrow(ihs_ko_summary7))
 
-# Identify highest 0.5% of median CLR scores
-tp_subset <- clr_MAYUGE_summary[clr_MAYUGE_summary$MEDIAN_clr_MAYUGE >= quantile(clr_MAYUGE_summary$MEDIAN_clr_MAYUGE,.9950),]
-clr_MAYUGE_cutoff <- as.numeric(head(tp_subset[order(tp_subset$MEDIAN_clr_MAYUGE),],1)[3])
+# Remove windows with less than 20 variants per window
+ihs_ko_summary <- subset(ihs_ko_summary7, SNP_COUNT>=20)
 
-# Group windows into 3 categories based on chromosome number and whether windows fall into highest 0.5% of values
-clr_MAYUGE_summary$COLOR_clr_MAYUGE <- clr_MAYUGE_summary$CHROM
-clr_MAYUGE_summary$COLOR_clr_MAYUGE<- ifelse(clr_MAYUGE_summary$CHROM == 1,"A",
-                                          ifelse(clr_MAYUGE_summary$CHROM == 3,"A",
-                                                 ifelse(clr_MAYUGE_summary$CHROM == 5,"A",
-                                                        ifelse(clr_MAYUGE_summary$CHROM == 7,"A", no="B"))))
-clr_MAYUGE_summary$COLOR_clr_MAYUGE[clr_MAYUGE_summary$MEDIAN_clr_MAYUGE>(clr_MAYUGE_cutoff)] <- "TP"
+# Identify highest 0.25% of median iHS scores
+tp_subset <- ihs_ko_summary[ihs_ko_summary$MEDIAN_ihs_ko >= quantile(ihs_ko_summary$MEDIAN_ihs_ko,.9975, na.rm=TRUE),]
+ihsko_cutoff <- as.numeric(head(tp_subset[order(tp_subset$MEDIAN_ihs_ko),],1)[3])
+
+# Group windows into 3 categories based on chromosome number and whether windows fall into highest 0.25% of values
+ihs_ko_summary$COLOR_ihs_ko <- ihs_ko_summary$CHROM
+ihs_ko_summary$COLOR_ihs_ko <- ifelse(ihs_ko_summary$CHROM == 1,"A",
+                                          ifelse(ihs_ko_summary$CHROM == 3,"A",
+                                                 ifelse(ihs_ko_summary$CHROM == 5,"A",
+                                                        ifelse(ihs_ko_summary$CHROM == 7,"A", no="B"))))
+
+Tororo_IHS<- ggplot(subset(ihs_ko_summary,SNP_COUNT>=20), aes(x=ID, y=abs(MEDIAN_ihs_ko))) +
+  geom_point( aes(color=as.factor(CHROM)),size=0.0001) +
+  ylab("Median | iHS |") +
+  scale_color_manual(values = rep(c("grey75", "grey40"),8)) +
+  scale_x_continuous( label = axisdf$CHROM, breaks= axisdf$center, expand=c(0,0)) +
+  scale_y_continuous(expand=c(0,0), limits=c(0,6), breaks=c(0.0,3.0,6.0)) +
+  theme_bw() +
+  selection_theme
 ```
-## Figure 4D: XP-EHH <a name="figure3d"></a>
+## Figure 4C: XP-EHH <a name="figure3c"></a>
 ```{r}
-# Read in data
-xpehh_allvsko <- read.table("xpehh.out.norm.all", header=TRUE)
 
-# Create windows based on site locations
-xpehh_allvsko_median <- aggregate(as.numeric(normxpehh)~CHROM+START, xpehh_allvsko, median)
-xpehh_allvsko_length <- aggregate(as.numeric(normxpehh)~CHROM+START, xpehh_allvsko, FUN=length)
-
-# Merge median iHS and variant counts per window 
-xpehh_allvsko$START <- (RoundTo(as.numeric(xpehh_allvsko$pos), multiple = 25000, FUN = floor)+1)
-xpehh_allvsko$STOP <- (RoundTo(as.numeric(xpehh_allvsko$pos), multiple = 25000, FUN = ceiling))
-
-# Merge median XP-EHH and variant counts per window 
-xpehh_summary <- merge(xpehh_allvsko_median, xpehh_allvsko_length, by.x = c("CHROM","START"), by.y = c("CHROM","START"))
-
-# Rename table headers
-names(xpehh_summary) <- c("CHROM", "BIN_START","MEDIAN_XPEHH", "N_VARIANTS_XPEHH")
-
-# Identify highest 0.5% of median XP-EHH scores
-tp_subset <- xpehh_summary[xpehh_summary$MEDIAN_XPEHH >= quantile(xpehh_summary$MEDIAN_XPEHH,.9950),]
-xpehh_cutoff <- as.numeric(head(tp_subset[order(tp_subset$MEDIAN_XPEHH),],1)[3])
-
-# Group windows into 3 categories based on chromosome number and whether windows fall into highest 0.5% of values
-xpehh_summary$COLOR_XPEHH <- xpehh_summary$CHROM
-xpehh_summary$COLOR_XPEHH <- ifelse(xpehh_summary$CHROM == 1,"A",
-                                    ifelse(xpehh_summary$CHROM == 3,"A",
-                                           ifelse(xpehh_summary$CHROM == 5,"A",
-                                                  ifelse(xpehh_summary$CHROM == 7,"A", no="B"))))
-xpehh_summary$COLOR_XPEHH[xpehh_summary$MEDIAN_XPEHH>(xpehh_cutoff)] <- "TP"
 ```
 ## Figure 4E: F<sub>ST</sub> <a name="figure3e"></a>
 ```{r}
