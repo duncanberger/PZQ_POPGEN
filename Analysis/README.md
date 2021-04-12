@@ -3,8 +3,9 @@
 ## Table of contents
 0. [Project setup](#setup)
 1. [Population Structure](#structure)
-2. [Selection](#Selection)
+2. [Selection](#selection)
 3. [Association](#association)
+4. [Population bottleneck](#bottleneck)
 
 ## 00 - Project setup <a name="setup"></a>
 ### Setup a working environment for the analysis.
@@ -16,7 +17,7 @@ cd ${WORKING_DIR}/06_ANALYSIS
 mkdir 00_SCRIPTS 01_STRUCTURE 02_SELECTION 03_ASSOCIATION
 ```
 ___
-## 01 - Population structure <a name="setup"></a>
+## 01 - Population structure <a name="structure"></a>
 ### Create plink files
 ```
 cd 01_STRUCTURE
@@ -140,7 +141,7 @@ sed -i 's/SM_V7_//g' autosomes_unfiltered.bim
 king -bfile ${WORKING_DIR}/06_ANALYSIS/01_STRUCTURE/autosomes_unfiltered.bed --related --prefix autosomes_unfiltered
 ```
 ___
-## 02 - Selection <a name="setup"></a>
+## 02 - Selection <a name="selection"></a>
 ### Create input VCFs
 ```
 cd ${WORKING_DIR}/06_ANALYSIS/02_SELECTION
@@ -216,20 +217,6 @@ cat *.xpehh.out.norm.temp > xpehh.out.norm.all
 
 # Output can be passed to figure_3.R
 ```
-### Calculate CLR with districts (per chromosome)
-```
-# Calculate CLR per district, per chromosome
-parallel --dry-run "SweeD-P -name {1}.{2} -input PZQ_POPGEN.biallelic.{1}.{2}.vcf -grid 20000" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW ::: mayuge tororo
-
-# Add chromosome name to output
-parallel --dry-run "grep -v '/' SweeD_Report.{1}.{2} | grep -v 'al' -i | grep -v '^$' | sed -e 's/^/{1}\t/g' > {1}.{2}.swd.temp" ::: SM_V7_1 ::: mayuge tororo
-
-# Combine output for each district
-cat *.mayuge.swd.temp > all.mayuge.swd
-cat *.tororo.swd.temp > all.tororo.swd
-
-# Output can be passed to figure_3.R
-```
 ### Calculate FST between districts (per chromosome)
 ```
 # Run PIXY (described above too, the specific command is)
@@ -248,7 +235,7 @@ cat pixy.SM_V7_*.25000.district_fst.txt | grep -v pop | cat fst.header - > fst.d
 # Output can be passed to figure_3.R
 ```
 ___
-## 03 - Association <a name="setup"></a>
+## 03 - Association <a name="association"></a>
 ```
 # Create phenotype and covariate files
 cut -f1,4 /00_METADATA/supplementary_table_2.txt | grep PZQ | sed -e 's/^/0\t/g' | sed 's/Good_clearers/1/g' | sed 's/Post-treatment/2/g' | grep -v 'Pre' > bin_treatment.pheno
@@ -275,3 +262,38 @@ cat ERR_linear_covar4_mayuge_maf.linear.adjusted | tr -s ' ' | sed 's/^ //g' | s
 
 # Output can be passed to figure_4.R
 ```
+## 03 - Population bottleneck <a name="bottleneck"></a>
+```
+# Get variant sites not in linkage disequilibrium (from plink filtering above)
+sed 's/_/ /3' autosomes_unfiltered.prune.in > keep.LD.list
+
+# Randomly subset to 200,000 variants 5x times.
+cat keep.LD.list | shuf | head -200000 > keep.LD.A.list
+cat keep.LD.list | shuf | head -400000 | tail -200000 > keep.LD.B.list
+cat keep.LD.list | shuf | head -600000 | tail -200000 > keep.LD.C.list
+cat keep.LD.list | shuf | head -800000 | tail -200000 > keep.LD.D.list
+cat keep.LD.list | shuf | head -1000000 | tail -200000 > keep.LD.E.list
+
+# Subset VCF to contain only those subset variants, using the vcf that hasn't been filtered by MAF (repeat for subsets B-E), using a list of samples from each school (repeat for other schools). 
+vcftools --vcf merged_all_samples.filtered.vcf.FL2.vcf --positions keep.LD.A.list --recode --recode-INFO-all --out LD_pruned.A.allMAF.vcf
+
+# Identify best value for projecting down each population. Using a file of samples names (col 1) and source population (col 2)
+easySFS.py -i LD_pruned.A.allMAF.vcf -p pops_file.txt --preview
+
+# Pick best projection value that works for all populations 
+easySFS.py -i LD_pruned.A.allMAF.vcf -p pop.list -f --proj 30,30,30,30 -a -o REP_A
+
+# Repeat for each replicate (B-E) and collect SFS values
+parallel "cat REP_{}/dadi/Kocoge-30.sfs | head -2 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Kocoge\"}'" ::: A B C D E >> sfs_30.list
+parallel "cat REP_{}/dadi/Bwondha-30.sfs | head -2 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Bwondha\"}'" ::: A B C D E >> sfs_30.list
+parallel "cat REP_{}/dadi/Bugoto-30.sfs | head -2 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Bugoto\"}'" ::: A B C D E >> sfs_30.list
+parallel "cat REP_{}/dadi/Musubi-30.sfs | head -2 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Musubi\"}'" ::: A B C D E >> sfs_30.list
+
+# And collect residual values
+parallel "cat REP_{}/dadi/Kocoge-30.sfs | head -3 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Kocoge\"}'" ::: A B C D E >> sfs_30_res.list
+parallel "cat REP_{}/dadi/Bwondha-30.sfs | head -3 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Bwondha\"}'" ::: A B C D E >> sfs_30_res.list
+parallel "cat REP_{}/dadi/Bugoto-30.sfs | head -3 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Bugoto\"}'" ::: A B C D E >> sfs_30_res.list
+parallel "cat REP_{}/dadi/Musubi-30.sfs | head -3 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Musubi\"}'" ::: A B C D E >> sfs_30_res.list
+```
+
+
