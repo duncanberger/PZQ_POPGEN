@@ -1,4 +1,4 @@
-# Supplementary figure 1: Variant quality control
+# Supplementary figure 2: Variant quality control
 ```{r}
 # Import data
 summary_vQC <- read.table("cohort.genotyped.tbl", header=TRUE)
