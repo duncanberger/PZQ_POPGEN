@@ -1,4 +1,4 @@
-# Figure 6: Impact of a single-round of praziquantel treatment on the Mayuge district Schistosoma mansoni populations
+# Figure 5: Impact of a single-round of praziquantel treatment on the Mayuge district Schistosoma mansoni populations
 
 0. [Setup](#setup)
 1. [Figure 4A](#figure4a)
