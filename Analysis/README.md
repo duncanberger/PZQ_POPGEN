@@ -263,16 +263,17 @@ cat ERR_linear_covar4_mayuge_maf.linear.adjusted | tr -s ' ' | sed 's/^ //g' | s
 # Output can be passed to figure_4.R
 ```
 ## 04 - Population bottleneck <a name="bottleneck"></a>
+### Site frequency spectra
 ```
 # Get variant sites not in linkage disequilibrium (from plink filtering above)
 sed 's/_/ /3' autosomes_unfiltered.prune.in > keep.LD.list
 
 # Randomly subset to 200,000 variants 5x times.
 cat keep.LD.list | shuf | head -200000 > keep.LD.A.list
-cat keep.LD.list | shuf | head -400000 | tail -200000 > keep.LD.B.list
-cat keep.LD.list | shuf | head -600000 | tail -200000 > keep.LD.C.list
-cat keep.LD.list | shuf | head -800000 | tail -200000 > keep.LD.D.list
-cat keep.LD.list | shuf | head -1000000 | tail -200000 > keep.LD.E.list
+cat keep.LD.list | grep -v -f keep.LD.A.list| shuf | head -200000 > keep.LD.B.list
+cat keep.LD.list | grep -v -f keep.LD.A.list | grep -v -f keep.LD.B.list| shuf | head -200000 > keep.LD.C.list
+cat keep.LD.list | grep -v -f keep.LD.A.list | grep -v -f keep.LD.B.list| grep -v -f keep.LD.C.list| shuf | head -200000 > keep.LD.D.list
+cat keep.LD.list | grep -v -f keep.LD.A.list | grep -v -f keep.LD.B.list| grep -v -f keep.LD.C.list| grep -v -f keep.LD.D.list| shuf | head -200000 > keep.LD.E.list
 
 # Subset VCF to contain only those subset variants, using the vcf that hasn't been filtered by MAF (repeat for subsets B-E), using a list of samples from each school (repeat for other schools). 
 vcftools --vcf merged_all_samples.filtered.vcf.FL2.vcf --positions keep.LD.A.list --recode --recode-INFO-all --out LD_pruned.A.allMAF.vcf
@@ -295,5 +296,11 @@ parallel "cat REP_{}/dadi/Bwondha-30.sfs | head -3 | tail -1 | tr ' ' '\n' | awk
 parallel "cat REP_{}/dadi/Bugoto-30.sfs | head -3 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Bugoto\"}'" ::: A B C D E >> sfs_30_res.list
 parallel "cat REP_{}/dadi/Musubi-30.sfs | head -3 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Musubi\"}'" ::: A B C D E >> sfs_30_res.list
 ```
-
-
+### Tajima's D
+```
+# Calculate Tajima's D for each school subpopulation in 5 kb windows. 
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep KOCOGE.list --TajimaD 5000 --out KOCOGE_TAJIMA_D
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep MUSUBI.list --TajimaD 5000 --out MUSUBI_TAJIMA_D
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep BWONDHA.list --TajimaD 5000 --out BWONDHA_TAJIMA_D
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep BUGOTO.list --TajimaD 5000 --out BUGOTO_TAJIMA_D
+```
