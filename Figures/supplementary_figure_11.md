@@ -16,8 +16,6 @@ axisdf = td_merged %>% group_by(CHROM) %>% summarize(center=( max(ID) + min(ID) 
 ```{r}
 M <- ggplot(subset(td_merged,N_SNPS.x>20), aes(x=ID, y=(TajimaD.x))) +
   geom_point( aes(color=as.factor(CHROM)),size=0.0001) +
-  #  annotate("text",x=13500, y=4.6, label="Mayuge",fontface = "bold") +
-  #  ylab("Median | iHS |") +
   geom_hline(yintercept = 0, linetype="dashed") +
   scale_color_manual(values = rep(c("grey75", "grey40"),8)) +
   scale_x_continuous( label = axisdf$CHROM, breaks= axisdf$center, expand=c(0,0)) +
@@ -28,8 +26,6 @@ M <- ggplot(subset(td_merged,N_SNPS.x>20), aes(x=ID, y=(TajimaD.x))) +
 
 T <- ggplot(subset(td_merged,N_SNPS.x>20), aes(x=ID, y=(TajimaD.y))) +
   geom_point( aes(color=as.factor(CHROM)),size=0.0001) +
-  #  annotate("text",x=13500, y=4.6, label="Mayuge",fontface = "bold") +
-  #  ylab("Median | iHS |") +
   geom_hline(yintercept = 0, linetype="dashed") +
   scale_color_manual(values = rep(c("grey75", "grey40"),8)) +
   scale_x_continuous( label = axisdf$CHROM, breaks= axisdf$center, expand=c(0,0)) +
@@ -42,7 +38,6 @@ T <- ggplot(subset(td_merged,N_SNPS.x>20), aes(x=ID, y=(TajimaD.y))) +
 ```{r} 
 M_TM <- ggplot(subset(td_merged,N_SNPS.x>20), aes(x=ID, y=log10(TajimaD.x/TajimaD.y))) +
   geom_point( aes(color=as.factor(CHROM)),size=0.0001) +
- # annotate("text",x=33500, y=4.6, label="Mayuge-Tororo",fontface = "bold") +
   scale_color_manual(values = rep(c("grey75", "grey40"),8)) +
   scale_x_continuous( label = axisdf$CHROM, breaks= axisdf$center, expand=c(0,0)) +
   scale_y_continuous(expand=c(0,0), limits=c(-4,4), breaks=c(-4,-2,0,2,4)) +
