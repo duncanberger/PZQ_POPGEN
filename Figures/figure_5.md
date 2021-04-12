@@ -1,11 +1,11 @@
 # Figure 5: Impact of a single-round of praziquantel treatment on the Mayuge district Schistosoma mansoni populations
 
 0. [Setup](#setup)
-1. [Figure 4A](#figure4a)
-2. [Figure 4B](#figure4b)
-3. [Figure 4C](#figure4c)
-4. [Figure 4D](#figure4d)
-5. [Figure 4E](#figure4e)
+1. [Figure 5A](#figure5a)
+2. [Figure 5B](#figure5b)
+3. [Figure 5C](#figure5c)
+4. [Figure 5D](#figure5d)
+5. [Figure 5E](#figure5e)
 6. [Merged figure](#merge)
 ## Setup <a name="setup"></a>
 ```{r}
@@ -22,7 +22,7 @@ key <- read.table("supplementary_table_2.txt", header=TRUE, sep="\t", check.name
 scaleFUN <- function(x) sprintf("%.1f", x)
 
 ```
-## Figure 5A: Nucleotide diversity estimates <a name="figure4a"></a>
+## Figure 5A: Nucleotide diversity estimates <a name="figure5a"></a>
 ```{r}
 #Create theme
 pi_theme <- theme(panel.grid.major = element_blank(),
@@ -62,7 +62,7 @@ pi_all <- ggplot(data=treatment_5kb_pi_2, aes(x=pop, y=log10(avg_pi), fill=pop, 
   theme(legend.text = element_text(size=6.5, face = "bold"),
         axis.text = element_text(color = "black"))
 ```
-## Figure 5B:  <a name="figure4b"></a>
+## Figure 5B:  <a name="figure5b"></a>
 ### Calculate median F<sub>ST</sub> 
 ```{r}
 # Read in data
@@ -115,7 +115,7 @@ for (i in 1:100) {
 }
 quantile(bstrap_medians,c(0.05,0.95))
 ```
-## Figure 5C:  <a name="figure4c"></a>
+## Figure 5C:  <a name="figure5c"></a>
 ```{r}
 # Create plot theme
 fst_theme <- theme(legend.position="none",panel.grid = element_blank(),
@@ -126,65 +126,52 @@ fst_theme <- theme(legend.position="none",panel.grid = element_blank(),
                    strip.background = element_blank(),
                    panel.border = element_rect(color="black"),
                      axis.title.x=element_blank())
-
 # Read in data
-fst_treatment_25kb <- read.table('fst.treatment.25kb.txt', header=TRUE)
+fst_treatment_2k <- read.table('fst.windows.2kb.b.txt', header=TRUE)
+fst_treatment_2kb <- merge(fst_treatment_2k, windows, by.x=c("CHROM","BIN_START"), by.y=c("CHROM","BIN_START"))
 
 # Order by chromosome and position
-fst_treatment_25kb <- fst_treatment_25kb[order(fst_treatment_25kb$chromosome, fst_treatment_25kb$window_pos_1),]
-fst_treatment_25kb$ID <- seq.int(nrow(fst_treatment_25kb))
+fst_treatment_2kb <- fst_treatment_2kb[order(fst_treatment_2kb$CHROM, fst_treatment_2kb$BIN_START),]
+fst_treatment_2kb$ID <- seq.int(nrow(fst_treatment_2kb))
+names(fst_treatment_2kb) <- c("CHROM", "BIN_START","BIN_END", "N_VARIANTS","WEIGHTED_FST","MEAN_FST","PRE_POST","BIN_STOP","SNP_COUNT","ID")
 
 # Order placement of axis labels
-axisdf = fst_treatment_25kb %>% group_by(chromosome) %>% summarize(center=( max(ID) + min(ID) ) / 2 )
+axisdf = fst_treatment_2kb %>% group_by(CHROM) %>% dplyr::summarize(center=( max(ID) + min(ID) ) / 2 )
 
 # Plot good clearers vs post-treatment 
-GvsPO <- ggplot(subset(fst_treatment_25kb,no_snps >500 & pop1=="Good_clearers" & pop2=="Post-treatment"), aes(x=ID, y=(avg_wc_fst))) +
-  geom_point( aes(color=as.factor(chromosome)),size=0.5) +
+GvsPO <- ggplot(subset(fst_treatment_2kb,SNP_COUNT>=20 & PRE_POST=="POST_GOOD"), aes(x=ID, y=as.numeric(WEIGHTED_FST))) +
+  geom_point( aes(color=as.factor(CHROM)),size=0.0001) +
   scale_color_manual(values = rep(c("grey75", "grey40"),8)) +
-  scale_x_continuous( label = axisdf$chromosome, breaks= axisdf$center, expand=c(0,0) ) +
-  scale_y_continuous(expand=c(0,0), limits=c(0.0,0.5), breaks=c(0,0.25,0.5)) +
+  scale_x_continuous( label = axisdf$CHROM, breaks= axisdf$center, expand=c(0,0) ) +
+  scale_y_continuous(expand=c(0,0), limits=c(0.0,0.2), breaks=c(0,0.1,0.2)) +
   theme_bw() + 
-  labs(y=expression(bold(F[ST])))+
-  annotate("text",x=20500, y=0.45,parse=TRUE,size=3, label='bold("Good clearers vs Post-treatment")') +
+  labs(y=expression(bold("Median "*F[ST])))+
   fst_theme +
   theme(axis.text.x=element_blank())
 
 # Plot good clearers vs pre-treatment 
-GvsPR <- ggplot(subset(fst_treatment_25kb, pop1=="Good_clearers" & pop2=="Pre-treatment"), aes(x=ID, y=(avg_wc_fst))) +
-  geom_point( aes(color=as.factor(chromosome)),size=0.5) +
+GvsPR <- ggplot(subset(fst_treatment_2kb,SNP_COUNT>=20 & PRE_POST=="PRE_GOOD"), aes(x=ID, y=as.numeric(WEIGHTED_FST))) +
+  geom_point( aes(color=as.factor(CHROM)),size=0.0001) +
   scale_color_manual(values = rep(c("grey75", "grey40"),8)) +
-  scale_x_continuous( label = axisdf$chromosome, breaks= axisdf$center, expand=c(0,0) ) +
-  scale_y_continuous(expand=c(0,0), limits=c(0.0,0.5), breaks=c(0,0.25,0.5)) +
+  scale_x_continuous( label = axisdf$CHROM, breaks= axisdf$center, expand=c(0,0) ) +
+  scale_y_continuous(expand=c(0,0), limits=c(0.0,0.2), breaks=c(0,0.1,0.2)) +
   theme_bw() + 
-  annotate("text",x=20500, y=0.45,parse=TRUE,size=3, label='bold("Good clearers vs Pre-treatment")') +
   labs(y=expression(bold(F[ST])))+
   fst_theme+
   theme(axis.text.x=element_blank())
 
 # Plot pre-treatment vs post-treatment 
-PRvsPO <- ggplot(subset(fst_treatment_25kb pop1=="Post-treatment" & pop2=="Pre-treatment"), aes(x=ID, y=(avg_wc_fst))) +
-  geom_point( aes(color=as.factor(chromosome)),size=0.5) +
+PRvsPO <- ggplot(subset(fst_treatment_2kb,SNP_COUNT>=20 & PRE_POST=="PRE_POST"), aes(x=ID, y=as.numeric(WEIGHTED_FST))) +
+  geom_point( aes(color=as.factor(CHROM)),size=0.0001)+
   scale_color_manual(values = rep(c("grey75", "grey40"),8)) +
-  scale_x_continuous( label = axisdf$chromosome, breaks= axisdf$center, expand=c(0,0) ) +
-  scale_y_continuous(expand=c(0,0), limits=c(0.0,0.5), breaks=c(0,0.25,0.5))+
+  scale_x_continuous( label = axisdf$CHROM, breaks= axisdf$center, expand=c(0,0) ) +
+  scale_y_continuous(expand=c(0,0), limits=c(0.0,0.2), breaks=c(0,0.1,0.2)) +
   theme_bw() +
-  annotate("text",x=20500, y=0.45,parse=TRUE,size=3, label='bold("Pre-treatment vs Post-treatment")') +
   labs(y=expression(bold("Weighted "*F[ST])))+
   fst_theme +
-  theme(axis.text.x=element_blank())
- 
-# Replicate of above plot, just with axis labels (it's weird but it prevents graphs being uneven sizes)
-label <- ggplot(subset(fst_treatment_25kb pop1=="Post-treatment" & pop2=="Pre-treatment"), aes(x=ID, y=(avg_wc_fst))) +
-  geom_point( aes(color=as.factor(chromosome)),size=0.5) +
-  scale_color_manual(values = rep(c("grey75", "grey40"),8)) +
-  scale_x_continuous( label = axisdf$chromosome, breaks= axisdf$center, expand=c(0,0) ) +
-  scale_y_continuous(expand=c(0,0), limits=c(0.0,0.5), breaks=c(0,0.25,0.5))+
-  theme_bw() +
-  annotate("text",x=20500, y=0.45,parse=TRUE,size=3, label='bold("Pre-treatment vs Post-treatment")') +
-  labs(y=expression(bold("Weighted "*F[ST])))+
-  fst_theme
+  theme(axis.text.x=element_blank()) 
 ```
-## Figure 5D: Logistic regression genome-wide association test <a name="figure4d"></a>
+## Figure 5D: Logistic regression genome-wide association test <a name="figure5d"></a>
 ```{r}
 # Create theme
 err_theme <- theme(legend.title = element_blank(),
@@ -235,7 +222,7 @@ ERR_BIN_UNADJ <- ggplot(assoc_BIN_ALL2, aes(x=as.numeric(ID), y=-log10(as.numeri
   fst_theme +
   theme(axis.text.x = element_blank())
 ```
-## Figure 5E: Linear regression genome-wide association test  <a name="figure4e"></a>
+## Figure 5E: Linear regression genome-wide association test  <a name="figure5e"></a>
 ```{r}
 # Read in data
 assoc_ERR_ALL <- read.table("ERR_linear_covar4_mayuge_maf.linear.adjusted.tbl", header=TRUE, sep='\t')
