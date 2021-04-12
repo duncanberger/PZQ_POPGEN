@@ -1,10 +1,10 @@
-# Figure 3: Signatures of recent selection
+# Figure 4: Signatures of recent selection
 
 0. [Setup](#setup)
-1. [Figure 3A](#figure3a)
-2. [Figure 3B](#figure3b)
-3. [Figure 3D](#figure3d)
-4. [Figure 3E](#figure3e)
+1. [Figure 4A](#figure4a)
+2. [Figure 4B](#figure4b)
+3. [Figure 4D](#figure4d)
+4. [Figure 4E](#figure4e)
 6. [Plot individual figures](#pindv)
 7. [Merge figures](#merge)
 ## Project setup <a name="setup"></a>
@@ -40,7 +40,7 @@ scaleFUN <- function(x) sprintf("%.1f", x)
 selection_colors <- rep(c("grey75", "grey40","#ef3b2c"))
 selection_colors2 <- rep(c("grey75", "grey40","#19abff"))
 ```
-## Figure 3A: iHS <a name="figure3a"></a>
+## Figure 4A: iHS <a name="figure3a"></a>
 ```{r}
 # Read in data
 ihs_noko <- read.table("mayuge.ihs.out.100bins.norm.all")
@@ -71,7 +71,7 @@ ihs_noko_summary$COLOR_ihs_noko <- ifelse(ihs_noko_summary$CHROM == 1,"A",
                                                         ifelse(ihs_noko_summary$CHROM == 7,"A", no="B"))))
 ihs_noko_summary$COLOR_ihs_noko[ihs_noko_summary$MEDIAN_ihs_noko>(ihsnoko_cutoff)] <- "TP"
 ```
-## Figure 3B: CLR <a name="figure3b"></a>
+## Figure 4B: CLR <a name="figure3b"></a>
 ```{r}
 # Read in data
 clr_MAYUGE <- read.table("all.mayuge.swd", header=FALSE)
@@ -102,7 +102,7 @@ clr_MAYUGE_summary$COLOR_clr_MAYUGE<- ifelse(clr_MAYUGE_summary$CHROM == 1,"A",
                                                         ifelse(clr_MAYUGE_summary$CHROM == 7,"A", no="B"))))
 clr_MAYUGE_summary$COLOR_clr_MAYUGE[clr_MAYUGE_summary$MEDIAN_clr_MAYUGE>(clr_MAYUGE_cutoff)] <- "TP"
 ```
-## Figure 3D: XP-EHH <a name="figure3d"></a>
+## Figure 4D: XP-EHH <a name="figure3d"></a>
 ```{r}
 # Read in data
 xpehh_allvsko <- read.table("xpehh.out.norm.all", header=TRUE)
@@ -133,7 +133,7 @@ xpehh_summary$COLOR_XPEHH <- ifelse(xpehh_summary$CHROM == 1,"A",
                                                   ifelse(xpehh_summary$CHROM == 7,"A", no="B"))))
 xpehh_summary$COLOR_XPEHH[xpehh_summary$MEDIAN_XPEHH>(xpehh_cutoff)] <- "TP"
 ```
-## Figure 3E: F<sub>ST</sub> <a name="figure3e"></a>
+## Figure 4E: F<sub>ST</sub> <a name="figure3e"></a>
 ```{r}
 # Read in data
 fst_district <- read.table("district.25kb.fst.txt", header=TRUE)
@@ -184,7 +184,7 @@ summary_H2 <- summary_G2 %>% group_by(grp, CHROM) %>% summarise(ID_START = min(I
 # Order axis labels on chromosomes for each plot
 axisdf = summary_f1 %>% group_by(CHROM) %>% summarize(center=( max(ID) + min(ID) ) / 2 )
 
-# Plot iHS - figure 3A
+# Plot iHS - figure 4A
 IHS_NOKO <- ggplot(subset(summary_f1,N_VARIANTS_ihs_noko >25 & DENSITY>100), aes(x=ID, y=abs(MEDIAN_ihs_noko))) +
   geom_point( aes(color=as.factor(COLOR_ihs_noko)),size=0.3) +
   annotate("text",x=13500, y=4.6, label="Mayuge",fontface = "bold") +
@@ -195,7 +195,7 @@ IHS_NOKO <- ggplot(subset(summary_f1,N_VARIANTS_ihs_noko >25 & DENSITY>100), aes
   theme_bw() +
   selection_theme
 
-# Plot CLR - figure 3B
+# Plot CLR - figure 4B
 CLR_MAYUGE <- ggplot(subset(summary_f1, DENSITY>100), aes(x=ID, y=log10(MEDIAN_clr_MAYUGE))) +
   geom_point( aes(color=as.factor(COLOR_clr_MAYUGE)),size=0.3) +
   annotate("text",x=13500, y=4, label="Mayuge",fontface = "bold") +
@@ -206,7 +206,7 @@ CLR_MAYUGE <- ggplot(subset(summary_f1, DENSITY>100), aes(x=ID, y=log10(MEDIAN_c
   theme_bw() +
   selection_theme
 
-# Plot selected regions - figure 3B
+# Plot selected regions - figure 4B
 HIGHLIGHT <- ggplot(summary_H) + 
   geom_rect(aes(xmin=(ID_START-0.5), ymin=0, xmax=(as.numeric(ID_STOP+0.5)), ymax=1), fill="#ef3b2c")+
   geom_rect(aes(xmin=3602, ymin=0, xmax=3602, ymax=1), fill=NA, color="black", size=0.2) +
@@ -228,7 +228,7 @@ HIGHLIGHT <- ggplot(summary_H) +
         axis.ticks =element_blank(),
         axis.line = element_blank())
 
-# Plot XP-EHH - figure 3D
+# Plot XP-EHH - figure 4D
 XPEHH <- ggplot(subset(summary_f1,N_VARIANTS_XPEHH >25 & DENSITY>100), aes(x=ID, y=(MEDIAN_XPEHH))) +
   geom_point( aes(color=as.factor(COLOR_XPEHH)),size=0.3) +
   annotate("text",x=13500, y=8.0, label=paste0("Mayuge vs Tororo"), fontface = "bold") +
@@ -239,7 +239,7 @@ XPEHH <- ggplot(subset(summary_f1,N_VARIANTS_XPEHH >25 & DENSITY>100), aes(x=ID,
   theme_bw() + 
   selection_theme 
 
-# Plot FST - figure 3E
+# Plot FST - figure 4E
 FST <- ggplot(subset(summary_f1,no_snps>300 & DENSITY>100), aes(x=ID, y=(avg_wc_fst))) +
   geom_point( aes(color=as.factor(COLOR_FST)),size=0.3) +
   #  annotate("text",x=13500, y=0.65, label=paste0("Mayuge vs Tororo"), fontface = "bold") +
@@ -251,7 +251,7 @@ FST <- ggplot(subset(summary_f1,no_snps>300 & DENSITY>100), aes(x=ID, y=(avg_wc_
   theme_bw() +
   selection_theme
 
-# Plot selected regions - figure 3F
+# Plot selected regions - figure 4F
 HIGHLIGHT2 <- ggplot(summary_H2) + 
   geom_rect(aes(xmin=(ID_START-0.5), ymin=0, xmax=(as.numeric(ID_STOP+0.5)), ymax=1), fill="#19abff")+
   geom_rect(aes(xmin=3602, ymin=0, xmax=3602, ymax=1), fill=NA, color="black", size=0.2) +
