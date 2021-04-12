@@ -249,7 +249,7 @@ FST <- ggplot(subset(fst_district_3,SNP_COUNT>=20), aes(x=ID, y=WEIGHTED_FST)) +
   theme_bw() +
   selection_theme
 ```
-## Ratio of nucleotide diversity  <a name="figure3e"></a>
+## Figure 4E: Ratio of nucleotide diversity  <a name="figure4e"></a>
 ```{r}
 # Import data
 PI_TORORO <- read.table("TORORO_PI.windowed.pi", header=TRUE, na.strings = "nan")
