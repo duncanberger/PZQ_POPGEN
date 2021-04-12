@@ -39,28 +39,46 @@ pi_theme <- theme(panel.grid.major = element_blank(),
                   legend.text = element_text(face="bold", color="black"))
 
 # Load data
-treatment_5kb_pi <- read.table("pi.treatment.txt", header=TRUE, sep='\t')
+treatment_5kb_pi <- read.table("all.pi.treat.fix.txt", header=TRUE, sep='\t')
 
 # Order by treatment stage
 treatment_5kb_pi$pop = factor(treatment_5kb_pi$pop, levels=c('Good Clearers','Poor clearers: Pre-treatment','Poor clearers: Post-treatment'))
 
 # Subset for plotting
-treatment_5kb_pi_2 <- sample_n(treatment_5kb_pi, 25000)
+treatment_5kb_pi_2 <- sample_n(treatment_5kb_pi, 15000)
 
-# Plot
-pi_all <- ggplot(data=treatment_5kb_pi_2, aes(x=pop, y=log10(avg_pi), fill=pop, color=pop)) + 
+# Plot boxplot
+pi_all_a <- ggplot(data=treatment_5kb_pi_2, aes(x=pop, y=log10(avg_pi), fill=pop, color=pop)) + 
   geom_point(position=position_jitterdodge(dodge.width =1,jitter.width = 0.8),alpha=0.3, size=0.0001) +
   geom_boxplot(aes(fill=avg_pi),outlier.alpha = 0.0,notch = TRUE, outlier.colour = "grey35", color="black", alpha=0, width=0.325) +
   theme_bw() +
   scale_fill_manual(values=c("#785EF0","#DC267F","#FE6100","#02818a")) +
   scale_color_manual(values=c("#785EF0","#DC267F","#FE6100","#02818a")) +
-  scale_y_continuous(expand=c(0,0), limits=c(-50,50000), breaks=c(-4.00,-3.00,-2.00,-1.00,0.00),labels=scaleFUN) +
+  scale_y_continuous(expand=c(0,0), breaks=c(-4.00,-3.00,-2.00,-1.00),labels=scaleFUN) +
   coord_cartesian(ylim = c(-4, -1)) +
   labs(y=expression(bold(-log[10]*("\U03C0")))) +
   PCA_theme + theme(legend.position = "none") +
   xlab("") + 
   theme(legend.text = element_text(size=6.5, face = "bold"),
         axis.text = element_text(color = "black"))
+
+# Plot density plot
+pi_all_b <- ggplot(data=treatment_5kb_pi_2, aes(x=log10(avg_pi), fill=pop, color=pop)) +
+  geom_density(alpha=0.3) + 
+  theme_nothing()+
+  xlab("") + ylab("") +
+  scale_fill_manual(values=c("#785EF0","#DC267F","#FE6100","#02818a")) +
+  scale_color_manual(values=c("#785EF0","#DC267F","#FE6100","#02818a")) +
+  scale_y_continuous(expand=c(0,0), breaks=c(-4.00,-3.00,-2.00,-1.00),labels=scaleFUN) +
+  PCA_theme + theme(legend.position = "none") +
+  coord_cartesian(xlim = c(-4, -1)) +
+  theme(legend.text = element_text(face = "bold"),
+        axis.text =element_blank(), panel.border = element_blank(), axis.ticks = element_blank()) + 
+  coord_flip()
+
+# Combine plots
+pi_all <- plot_grid(pi_all_a,pi_all_b, nrow=1, align="h", rel_widths = c(1,0.2))
+
 ```
 ## Figure 5B:  <a name="figure5b"></a>
 ### Calculate median F<sub>ST</sub> 
