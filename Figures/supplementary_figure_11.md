@@ -14,7 +14,7 @@ axisdf = td_merged %>% group_by(CHROM) %>% summarize(center=( max(ID) + min(ID) 
 ```
 ## Plot for each population
 ```{r}
-M <- ggplot(subset(td_merged,N_SNPS.x>10), aes(x=ID, y=(TajimaD.x))) +
+M <- ggplot(subset(td_merged,N_SNPS.x>20), aes(x=ID, y=(TajimaD.x))) +
   geom_point( aes(color=as.factor(CHROM)),size=0.0001) +
   #  annotate("text",x=13500, y=4.6, label="Mayuge",fontface = "bold") +
   #  ylab("Median | iHS |") +
@@ -26,7 +26,7 @@ M <- ggplot(subset(td_merged,N_SNPS.x>10), aes(x=ID, y=(TajimaD.x))) +
   theme_bw() +
   selection_theme
 
-T <- ggplot(subset(td_merged,N_SNPS.x>10), aes(x=ID, y=(TajimaD.y))) +
+T <- ggplot(subset(td_merged,N_SNPS.x>20), aes(x=ID, y=(TajimaD.y))) +
   geom_point( aes(color=as.factor(CHROM)),size=0.0001) +
   #  annotate("text",x=13500, y=4.6, label="Mayuge",fontface = "bold") +
   #  ylab("Median | iHS |") +
@@ -40,7 +40,7 @@ T <- ggplot(subset(td_merged,N_SNPS.x>10), aes(x=ID, y=(TajimaD.y))) +
 ```
 ## Plot the difference between populations
 ```{r} 
-M_TM <- ggplot(subset(td_merged,N_SNPS.x>10), aes(x=ID, y=log10(TajimaD.x/TajimaD.y))) +
+M_TM <- ggplot(subset(td_merged,N_SNPS.x>20), aes(x=ID, y=log10(TajimaD.x/TajimaD.y))) +
   geom_point( aes(color=as.factor(CHROM)),size=0.0001) +
  # annotate("text",x=33500, y=4.6, label="Mayuge-Tororo",fontface = "bold") +
   scale_color_manual(values = rep(c("grey75", "grey40"),8)) +
