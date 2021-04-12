@@ -22,4 +22,4 @@ ggplot(data=sex) +
         axis.title.y = element_text(face="bold", color="black"),
         axis.title.x = element_text(face="bold", color="black"),
         axis.text.x=element_text(face="bold", color="black"))
-```{r}
+```
