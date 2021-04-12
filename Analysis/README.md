@@ -262,7 +262,7 @@ cat ERR_linear_covar4_mayuge_maf.linear.adjusted | tr -s ' ' | sed 's/^ //g' | s
 
 # Output can be passed to figure_4.R
 ```
-## 03 - Population bottleneck <a name="bottleneck"></a>
+## 04 - Population bottleneck <a name="bottleneck"></a>
 ```
 # Get variant sites not in linkage disequilibrium (from plink filtering above)
 sed 's/_/ /3' autosomes_unfiltered.prune.in > keep.LD.list
