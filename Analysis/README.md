@@ -101,15 +101,16 @@ head -1 pixy.SM_V7_1.5000.school_dxy.txt > dxy.header
 head -1 pixy.SM_V7_1.5000.school_pi.txt > pi.header
 
 # Combine files for each chromosome
-cat pixy.SM_V7_*.5000.school_pi.txt | grep -v pop | cat pi.header - > pi.school.txt # Output can be passed to figure_2.R
-cat pixy.SM_V7_*.5000.host_pi.txt | grep -v pop | cat pi.header - > pi.host.txt # Output can be passed to supplementary_figure_5.R
-cat pixy.SM_V7_*.5000.treatment_pi.txt | grep -v pop | cat pi.header - > pi.treatment.txt # Output can be passed to figure_4.R
-cat pixy.SM_V7_*.5000.school_fst.txt | grep -v pop | cat fst.header - > fst.school.txt # Output can be passed to figure_2.R
-cat pixy.SM_V7_*.5000.school_dxy.txt | grep -v pop | cat dxy.header - > dxy.school.txt # Output can be passed to figure_2.R
-cat pixy.SM_V7_*.5000.treatment_fst.txt | grep -v pop | cat fst.header - > fst.treatment.txt # Output can be passed to figure_4.md
-cat pixy.SM_V7_*.5000.treatment_dxy.txt | grep -v pop | cat dxy.header - > dxy.treatment.txt # Output can be passed to figure_4.R
-cat pixy.SM_V7_*.25000.treatment_fst.txt | grep -v pop | cat fst.header - > fst.treatment.25kb.txt # Output can be passed to figure_4.R
-cat pixy.SM_V7_*.5000.host_fst.txt | grep -v pop | cat fst.header > fst.host.txt # Output can be passed to supplementary_table_7.R
+cat pixy.SM_V7_*.5000.school_pi.txt | grep -v pop | cat pi.header - > pi.school.txt 
+cat pixy.SM_V7_*.5000.host_pi.txt | grep -v pop | cat pi.header - > pi.host.txt 
+cat pixy.SM_V7_*.5000.treatment_pi.txt | grep -v pop | cat pi.header - > pi.treatment.txt
+cat pixy.SM_V7_*.5000.school_fst.txt | grep -v pop | cat fst.header - > fst.school.txt 
+cat pixy.SM_V7_*.5000.school_dxy.txt | grep -v pop | cat dxy.header - > dxy.school.txt 
+cat pixy.SM_V7_*.5000.treatment_fst.txt | grep -v pop | cat fst.header - > fst.treatment.txt 
+cat pixy.SM_V7_*.5000.treatment_dxy.txt | grep -v pop | cat dxy.header - > dxy.treatment.txt 
+cat pixy.SM_V7_*.5000.treatment_fst.txt | grep -v pop | cat fst.header - > fst.treatment.5kb.txt 
+cat pixy.SM_V7_*.2000.treatment_fst.txt | grep -v pop | cat fst.header - > fst.treatment.2kb.txt 
+cat pixy.SM_V7_*.5000.host_fst.txt | grep -v pop | cat fst.header > fst.host.txt 
 ```
 ### Recombination
 ```
@@ -223,7 +224,7 @@ cat *.xpehh.out.norm.temp > xpehh.out.norm.all
 parallel --dry-run "pixy --stats fst 
 --vcf PZQ_POPGEN.allsites.{1}.vcf 
 --zarr_path zarr/ 
---window_size 25000
+--window_size 2000 # Or 5kb where needed
 --reuse_zarr yes
 --populations district.list 
 --variant_filter_expression 'DP>=10,GQ>=20,RGQ>=20' 
