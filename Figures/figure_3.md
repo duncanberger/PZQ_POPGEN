@@ -1,8 +1,32 @@
 # Figure 3: S. mansoni population history
-## Setup <a name="setup"></a>
+## Figure 3A: 1D-SFS for each school subpopulation
+### Load and group SFS data
 ```{r}
+sfs <-read.csv("sfs.csv", header=TRUE)
+df.summary <- sfs %>%
+  group_by(Bin, School) %>%
+  subset(Bin>1) %>%
+  dplyr::summarise(
+    sd = sd((Value), na.rm = TRUE),
+    len = mean(Value)
+  )
+df.summary
 ```
-
+### Plot 1D-SFS
+```{r}
+d1sfs <- ggplot(data=subset(df.summary, Bin>1)) + 
+  geom_col(aes(x=(Bin-1), y=len/50000, fill=School), position = "dodge") +
+  scale_fill_manual(values=c("#56B4E9", "#009e73","#CC79A7","#E69f00","#D55E00","#0072b2"), na.value="grey50") +
+  geom_errorbar(aes(ymin=(len/50000)-(sd/50000), ymax=(len/50000)+(sd/50000), x=(Bin-1), group=School), width=.2, position=position_dodge(.9)) +
+  scale_y_continuous(limits=c(0,0.8), expand=c(0,0)) + 
+  scale_x_continuous(limits=c(0,31), expand=c(0,0), breaks=c(0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30)) + 
+  theme_bw() +
+  theme(axis.ticks.x = element_line(),
+        axis.title = element_text(face="bold", size=10)) + 
+  xlab("Allele frequency") + 
+  ylab("Proportion of alleles") +
+  PCA_theme
+```
 ## Figure 3B: Tajima’s D values for each school population 
 ### Import and order data
 ```{r}
