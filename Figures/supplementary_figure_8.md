@@ -1,26 +1,26 @@
-# Load libraries
+## Load libraries
 library(dplyr)
 library(ggplot2)
 library(stringr)
 library("ggpubr", lib.loc="~/Library/R/4.0/library")
 
-# Load data
+## Load data
 all_infra_pi1 <- read.table("pi.host.2.txt", header=TRUE)
 age_ND <- read.table("ND_AGE.csv", sep=",", header=TRUE)
 
-# Create a new column indicating school population
+## Create a new column indicating school population
 #all_infra_pi1$School <- str_sub(all_infra_pi1$pop, -5,-2)
 
-# Group by host, remove 2 hosts due to consistently low coverage 
+## Group by host, remove 2 hosts due to consistently low coverage 
 all_infra_pi3 <- all_infra_pi1 %>% group_by(pop) %>% sample_n(size = 1500)
 
-# Remove 2 hosts due to consistently low coverage 
+## Remove 2 hosts due to consistently low coverage 
 #all_infra_pi3 <- all_infra_pi2[(all_infra_pi2$pop!="Bu4" & all_infra_pi2$pop!="Bu5"),]
 
-# Order by school
+## Order by school
 all_infra_pi3$Site = factor(all_infra_pi3$School, levels=c('Bugoto','Bwondha','Musubi','Kocoge'))
 
-# Plot per-host nucleotide diversity (colored by school)
+## Plot per-host nucleotide diversity (colored by school)
 A <- ggplot(data=all_infra_pi3, aes(x=pop, y=log10(avg_pi), fill=School, color=School)) + 
   geom_point(position=position_jitterdodge(dodge.width =1,jitter.width = 0.8),alpha=0.3, size=0.1) +
   geom_boxplot(aes(fill=School),outlier.alpha = 0.0,notch = TRUE, outlier.colour = "grey35", color="black", 
@@ -38,7 +38,7 @@ A <- ggplot(data=all_infra_pi3, aes(x=pop, y=log10(avg_pi), fill=School, color=S
                     axis.title.y = element_text(face="bold", color="black"),
                     axis.title.x = element_text(face="bold", color="black"))
 
-# Plot per-host nucleotide diversity (colored by sex)        
+## Plot per-host nucleotide diversity (colored by sex)        
 D <- ggplot(data=all_infra_pi4, aes(x=pop, y=log10(avg_pi), fill=Sex, color=Sex)) + 
   geom_point(position=position_jitterdodge(dodge.width =1,jitter.width = 0.8),alpha=0.2, size=0.1) +
   geom_boxplot(aes(fill=Sex),outlier.alpha = 0.0,notch = TRUE, outlier.colour = "grey35", color="black", 
@@ -56,7 +56,7 @@ D <- ggplot(data=all_infra_pi4, aes(x=pop, y=log10(avg_pi), fill=Sex, color=Sex)
                     axis.title.y = element_text(face="bold", color="black"),
                     axis.title.x = element_text(face="bold", color="black"))
 
-# Plot median per-host nucleotide diversity (correlation to host age)
+## Plot median per-host nucleotide diversity (correlation to host age)
 B <- ggscatter(age_ND, x = "Age", y = "Median.Pi", add = "reg.line", size=0) +
   stat_cor(label.y = 0.0035, label.x=10.5, 
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
@@ -76,7 +76,7 @@ B <- ggscatter(age_ND, x = "Age", y = "Median.Pi", add = "reg.line", size=0) +
         axis.title.x = element_text(face="bold", color="black"),
         axis.ticks.x=element_blank())
 
-# Plot median per-host nucleotide diversity (correlation to infrapopulation size)
+## Plot median per-host nucleotide diversity (correlation to infrapopulation size)
 C <- ggscatter(age_ND, x = "Mira", y = "Median.Pi", add = "reg.line", size=0) +
   stat_cor(label.y = 0.001, label.x=5, 
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
@@ -96,10 +96,10 @@ C <- ggscatter(age_ND, x = "Mira", y = "Median.Pi", add = "reg.line", size=0) +
         axis.title.x = element_text(face="bold", color="black"),
         axis.ticks.x=element_blank())
 
-# Merge plots
+## Merge plots
 E <- plot_grid(B,C,nrow=1, labels=c("C","D"))
 plot_grid(A,D,E,nrow=3, labels=c("A","B",""))
 
-# Quick t-test for significance (host sex vs nucleotide diversity)
+## Quick t-test for significance (host sex vs nucleotide diversity)
 t.test(Median.Pi ~ Sex, data=subset(all_infra_pi4, pop!="Bu4" | pop!="Bu5"))
 t.test(Median.Pi ~ Sex, data=subset(age_ND))
