@@ -1,14 +1,16 @@
 ## Load libraries
+```{r}
 library(dplyr)
 library(ggplot2)
 library(stringr)
 library("ggpubr", lib.loc="~/Library/R/4.0/library")
-
-## Load data
+```
+# Load data
+```{r}
 all_infra_pi1 <- read.table("pi.host.2.txt", header=TRUE)
 age_ND <- read.table("ND_AGE.csv", sep=",", header=TRUE)
 
-## Create a new column indicating school population
+# Create a new column indicating school population
 #all_infra_pi1$School <- str_sub(all_infra_pi1$pop, -5,-2)
 
 ## Group by host, remove 2 hosts due to consistently low coverage 
@@ -99,7 +101,9 @@ C <- ggscatter(age_ND, x = "Mira", y = "Median.Pi", add = "reg.line", size=0) +
 ## Merge plots
 E <- plot_grid(B,C,nrow=1, labels=c("C","D"))
 plot_grid(A,D,E,nrow=3, labels=c("A","B",""))
-
+```
 ## Quick t-test for significance (host sex vs nucleotide diversity)
+```{r}
 t.test(Median.Pi ~ Sex, data=subset(all_infra_pi4, pop!="Bu4" | pop!="Bu5"))
 t.test(Median.Pi ~ Sex, data=subset(age_ND))
+```
