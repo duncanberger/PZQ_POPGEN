@@ -121,7 +121,6 @@ gatk GenotypeGVCFs --reference ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --var
 # Produce a table of quality scores for each variant site
 gatk VariantsToTable --variant merged_all_samples.vcf -F CHROM -F POS -F TYPE -F QD -F FS -F MQ -F MQRankSum -F ReadPosRankSum -F SOR -F InbreedingCoeff -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --output cohort.genotyped.tbl
 
-# Output can be passed to supplementary_figure_1.R
 ```
 ### Separate and filter SNPs
 ```
