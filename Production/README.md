@@ -85,7 +85,6 @@ parallel "coverageBed -a Sm_v7_nohap.25kb.bed -b {1}.markdup.bam > {1}.cov" ::::
 # Name and merge output
 parallel "awk '{print \$1,\$2,\$3,\$4,FILENAME}' {1}.cov | sed 's/.cov//g' | sed 's/SM_V7_//g' | sed 's/ZW/Z/g' > {1}.renamed.cov" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
 cat *.renamed.cov > all.renamed.cov
-# Output can be passed to supplementary_figure_3.R
 ```
 ## 04 - Variant calling <a name="variantcalling"></a>
 
