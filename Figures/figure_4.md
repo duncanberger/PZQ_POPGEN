@@ -43,8 +43,7 @@ selection_colors2 <- rep(c("grey75", "grey40","#19abff"))
 ## Figure 4A: Mayuge iHS <a name="figure4a"></a>
 ```{r}
 # Read in data
-#ihs_noko <- read.table("mayuge.ihs.out.100bins.norm.all")
-ihs_noko <- read.table("ALL.MAYUGE.IHS.ihs.out.100bins.norm.fixed") #remove
+ihs_noko <- read.table("ALL.MAYUGE.IHS.ihs.out.100bins.norm.fixed")
 
 #Create windows based on site locations
 ihs_noko$START <- (RoundTo(ihs_noko$V3, multiple = 2000, FUN = floor)+1)
