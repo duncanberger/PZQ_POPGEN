@@ -17,12 +17,12 @@ fst_sites <- read.table("MAYUGE_TORORO_sites.weir.fst", header=TRUE)
 # Load bed file of gene coordinates 
 gff <- read.table("genes.short.txt", header=FALSE)
 # Load per-site Pi values
-pi_MAY <- read.table("MAYUGE_SITE_PI.sites.pi", header=TRUE)
-pi_TOR <- read.table("KOCOGE_SITE_PI.sites.pi", header=TRUE)
+pi_MAY <- read.table("MAYUGE_SITE_PI.sites.pi.txt", header=TRUE)
+pi_TOR <- read.table("KOCOGE_SITE_PI.sites.pi.txt", header=TRUE)
 # Load coverage in 2kb windows
-site_cov_ALL <- read.table("all.name.cov", header=FALSE)
+site_cov_ALL <- read.table("coverage_5kb.windows.txt", header=FALSE)
 # Load median per sample coverage
-sample_cov <- read.table("med.cov.txt", header=TRUE)
+sample_cov <- read.table("median.sample.coverage.txt", header=TRUE)
 # Load metadata
 scmeta <- read.table("schools.list", header=FALSE)
 ```
