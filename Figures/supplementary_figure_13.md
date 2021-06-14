@@ -15,7 +15,7 @@ selection_theme <- theme(
 # Load FST values 
 fst_sites <- read.table("MAYUGE_TORORO_sites.weir.fst", header=TRUE)
 # Load bed file of gene coordinates 
-gff <- read.table("genes.short.txt", header=FALSE)
+gff <- read.table("genes.bed", header=FALSE)
 # Load per-site Pi values
 pi_MAY <- read.table("MAYUGE_SITE_PI.sites.pi.txt", header=TRUE)
 pi_TOR <- read.table("KOCOGE_SITE_PI.sites.pi.txt", header=TRUE)
