@@ -1,9 +1,9 @@
 # Supplementary figure 2: Variant quality control
 ```{r}
 # Import data
-summary_vQC <- read.table("cohort.genotyped.tbl", header=TRUE)
-site_QC <- read.table("hard_filtered_filtindv.lmiss", header=TRUE)
-sample_QC <- read.table("hard_filtered.imiss", header=TRUE)
+summary_vQC <- read.table("cohort.genotyped.txt", header=TRUE)
+site_QC <- read.table("hard_filtered_filtindv.lmiss.txt", header=TRUE)
+sample_QC <- read.table("hard_filtered.imiss.txt", header=TRUE)
 
 # Set ggplot theme
 qc_theme <-   theme( legend.position="none",panel.grid = element_blank(), 
