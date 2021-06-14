@@ -1,10 +1,10 @@
-## Setup <a name="setup"></a>
+## Supplementary Figure 7: Inference of demographic history using SMC++ for S. mansoni subpopulations
+# Setup <a name="setup"></a>
 ```{r}
 # Load required packages
 library("ggplot2")
 library("scales")
 ```
-## Supplementary Figure 7: Inference of demographic history using SMC++ for S. mansoni subpopulations
 # Load data
 ```
 smc <- read.table("smcpp.csv", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
