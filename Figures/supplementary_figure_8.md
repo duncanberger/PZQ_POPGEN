@@ -7,8 +7,8 @@ library("ggpubr", lib.loc="~/Library/R/4.0/library")
 ```
 # Load data
 ```{r}
-all_infra_pi1 <- read.table("pi.host.2.txt", header=TRUE)
-age_ND <- read.table("ND_AGE.csv", sep=",", header=TRUE)
+all_infra_pi1 <- read.table("pi.per_host.txt", header=TRUE)
+age_ND <- read.table("ND_AGE.csv", sep=",", header=TRUE) # Not available due to prescence of indirect identifiers
 
 # Create a new column indicating school population
 #all_infra_pi1$School <- str_sub(all_infra_pi1$pop, -5,-2)
