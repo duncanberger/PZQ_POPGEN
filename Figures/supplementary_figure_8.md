@@ -3,7 +3,7 @@
 library(dplyr)
 library(ggplot2)
 library(stringr)
-library("ggpubr", lib.loc="~/Library/R/4.0/library")
+library("ggpubr")
 ```
 # Load data
 ```{r}
