@@ -5,7 +5,7 @@ library(ggplot2)
 library(dplyr)
 
 # Read in data
-all.bedtools.cov <- read.table("all.renamed.cov", header=FALSE)
+all.bedtools.cov <- read.table("median.coverage.all.windows.fixed.txt", header=FALSE)
 
 #Reorder windows
 all.bedtools.cov<- all.bedtools.cov[order(all.bedtools.cov$V1, all.bedtools.cov$V2),]
