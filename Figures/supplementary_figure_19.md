@@ -5,8 +5,8 @@ library(dplyr)
 library(ggplot2)
 
 # Load data
-ld_tororo <- read.table("all.median.kocoge.geno.ld", header=FALSE)
-ld_mayuge <- read.table("all.median.mayuge.geno.ld", header=FALSE)
+ld_tororo <- read.table("kocoge_median.ld.txt", header=FALSE)
+ld_mayuge <- read.table("mayuge_median.ld.txt", header=FALSE)
 
 # Plot for each district
 tororo <- ggplot(data=ld_tororo) + 
