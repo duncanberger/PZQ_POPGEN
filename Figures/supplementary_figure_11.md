@@ -2,8 +2,8 @@
 
 ## Import Tajima's D data for both subpopulations
 ```{r}
-taj_MAYUGE <- read.table("MAYUGE_TAJIMA_D.Tajima.D.fixed", header=TRUE, na.strings = "nan")
-taj_TORORO <- read.table("TORORO_TAJIMA_D.Tajima.D.fixed", header=TRUE, na.strings = "nan")
+taj_MAYUGE <- read.table("MAYUGE_TAJIMA_D.Tajima.D.2kb.txt", header=TRUE, na.strings = "nan")
+taj_TORORO <- read.table("TORORO_TAJIMA_D.Tajima.D.2kb.txt", header=TRUE, na.strings = "nan")
 ```
 ## Merge and order data
 ```{r}
