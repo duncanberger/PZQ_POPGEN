@@ -145,7 +145,7 @@ fst_theme <- theme(legend.position="none",panel.grid = element_blank(),
                    panel.border = element_rect(color="black"),
                      axis.title.x=element_blank())
 # Read in data
-fst_treatment_2k <- read.table('fst.windows.2kb.b.txt', header=TRUE)
+fst_treatment_2k <- read.table('fst.windows.2kb.treatment.txt', header=TRUE)
 fst_treatment_2kb <- merge(fst_treatment_2k, windows, by.x=c("CHROM","BIN_START"), by.y=c("CHROM","BIN_START"))
 
 # Order by chromosome and position
@@ -203,7 +203,7 @@ err_theme <- theme(legend.title = element_blank(),
                        strip.background = element_blank())
                        
 # Read in data
-assoc_BIN_ALL <- read.table("BIN_assoc_covar4_mayuge_maf.logistic.adjusted.tbl", header=TRUE, sep='\t')
+assoc_BIN_ALL <- read.table("assoc_err_binary.txt", header=TRUE, sep='\t')
 
 # Add a color variable for each chromosome
 assoc_BIN_ALL$COLOR<- assoc_BIN_ALL$CHR
@@ -243,7 +243,7 @@ ERR_BIN_UNADJ <- ggplot(assoc_BIN_ALL2, aes(x=as.numeric(ID), y=-log10(as.numeri
 ## Figure 5E: Linear regression genome-wide association test  <a name="figure5e"></a>
 ```{r}
 # Read in data
-assoc_ERR_ALL <- read.table("ERR_linear_covar4_mayuge_maf.linear.adjusted.tbl", header=TRUE, sep='\t')
+assoc_ERR_ALL <- read.table("assoc_err_linear.txt", header=TRUE, sep='\t')
 
 # Add a color variable for each chromosome
 assoc_ERR_ALL$COLOR<- assoc_ERR_ALL$CHR
