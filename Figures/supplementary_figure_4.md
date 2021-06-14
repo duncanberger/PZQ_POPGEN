@@ -6,7 +6,7 @@ library("ggplot2")
 library("reshape2")
 
 # Load metadata
-key <- read.table("supplementary_table_2.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
+key <- read.table("supplementary_table_10.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
 ```
 ## Figure 2A: Principal component analysis <a name="figure2a"></a>
 ```{r}
@@ -20,9 +20,9 @@ PCA_theme <- theme(axis.title=element_text(face="bold",size=9),
                    panel.grid=element_blank(),
                    legend.title=element_blank())
 
-# Load data, produce in STEP X, and merge with metadata
-eigenvec <- read.delim("prunedData.eigenvec", header=TRUE, sep="\t")
-eigenval <- read.delim("prunedData.eigenval", sep="\t", header=FALSE)
+# Load data (same input as supplementary figure 3)
+eigenvec <- read.delim("prunedData_mira.eigenvec", header=TRUE, sep="\t")
+eigenval <- read.delim("prunedData_mira.eigenval", sep="\t", header=FALSE)
 eigenvec_merged <- (merge(key, eigenvec, all=TRUE, by.y = "IID", by.x='sample_ID'))
 
 # Calculate contribution of each eigenvalue to total variance
