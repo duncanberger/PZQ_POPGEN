@@ -43,7 +43,7 @@ selection_colors2 <- rep(c("grey75", "grey40","#19abff"))
 ## Figure 4A: Mayuge iHS <a name="figure4a"></a>
 ```{r}
 # Read in data
-ihs_noko <- read.table("ALL.MAYUGE.IHS.ihs.out.100bins.norm.fixed")
+ihs_noko <- read.table("ALL.MAYUGE.IHS.ihs.out.100bins.norm.txt")
 
 #Create windows based on site locations
 ihs_noko$START <- (RoundTo(ihs_noko$V3, multiple = 2000, FUN = floor)+1)
@@ -102,7 +102,7 @@ MAYUGE_IHS <- ggplot(subset(ihs_noko_summary_2,SNP_COUNT>=20), aes(x=ID, y=abs(M
 ## Figure 4B: Tororo iHS <a name="figure4b"></a>
 ```{r}
 # Import data
-ihs_ko <- read.table("ALL.TORORO.IHS.ihs.out.100bins.norm.fixed")
+ihs_ko <- read.table("ALL.TORORO.IHS.ihs.out.100bins.norm.txt")
 
 #Create windows based on site locations
 ihs_ko$START <- (RoundTo(ihs_ko$V3, multiple = 2000, FUN = floor)+1)
@@ -149,7 +149,7 @@ TORORO_IHS<- ggplot(subset(ihs_ko_summary,SNP_COUNT>=20), aes(x=ID, y=abs(MEDIAN
 ## Figure 4C: XP-EHH <a name="figure3c"></a>
 ```{r}
 # Read in data
-xpehh_allvsko <- read.table("xpehh.out.norm.all", header=TRUE)
+xpehh_allvsko <- read.table("ALL.MAYUGEvsTORORO.xpehh.xpehh.out.norm.txt", header=TRUE)
 
 # Create windows based on site locations
 xpehh_allvsko$START <- (RoundTo(as.numeric(xpehh_allvsko$pos), multiple = 2000, FUN = floor)+1)
@@ -205,7 +205,7 @@ XPEHH <- ggplot(subset(xpehh_summary_2,SNP_COUNT>20), aes(x=ID, y=(MEDIAN_XPEHH)
 ## Figure 4D: F<sub>ST</sub> <a name="figure4d"></a>
 ```{r}
 # Read in data
-fst_district <- read.table("MAYUGE_TORORO_2000.windowed.weir.B.fst", header=TRUE)
+fst_district <- read.table("MAYUGE_TORORO_2000.windowed.weir.txt", header=TRUE)
 
 # Merge data into windows 
 fst_district_summary <- merge(fst_district, windows, by.x = c("CHROM","BIN_START"), by.y = c("CHROM","BIN_START"), all.x = TRUE, all.y = TRUE)
