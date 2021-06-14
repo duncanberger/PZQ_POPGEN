@@ -88,7 +88,7 @@ tree <- ggtree(tree.test, layout="circular", aes(color=Site)) %<+% key +
 ## Figure 2C: Autosomal nucleotide diversity values <a name="figure2c"></a>
 ```{r}
 # Load nucleotide diversity results
-pi_5kb_schools <- read.table("pi.school.txt", header=TRUE)
+pi_5kb_schools <- read.table("all.pi.pixy.schools.txt", header=TRUE)
 
 # Order by school
 pi_5kb_schools$pop = factor(pi_5kb_schools$pop, levels=c('Bugoto','Bwondha','Musubi','Kocoge'))
