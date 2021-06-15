@@ -35,7 +35,7 @@ wget ftp://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS14/species
 gunzip schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa.gz
 
 # Exclude haplotype scaffolds and trim scaffold names
-seqtk subseq schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa <(grep "Retained" ${WORKING_DIR}/00_METADATA/supplementary_table_3.txt | cut -f1 | cat) | cut -f1 -d " " > Sm_v7_nohap.fa
+seqtk subseq schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa <(grep "Retained" ${WORKING_DIR}/00_METADATA/supplementary_table_11.txt | cut -f1 | cat) | cut -f1 -d " " > Sm_v7_nohap.fa
 
 # Create indexes and a sequence dictionary for the reference genome
 bwa index Sm_v7_nohap.fa
@@ -48,13 +48,13 @@ gatk CreateSequenceDictionary --REFERENCE Sm_v7_nohap.fa
 ### Download sequence reads
 ```
 # Download FASTQ files in parallel
-parallel -j4 --colsep '\t' "wget {1} {2}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | cut -f17 | grep 'gz' | tr ';' '\t')
+parallel -j4 --colsep '\t' "wget {1} {2}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | cut -f18 | grep 'gz' | tr ';' '\t')
 ```
 ### Map sequence reads to reference genome
 ```
 cd ${WORKING_DIR}/03_MAPPING
 
-parallel --dry-run --colsep '\t' "bwa mem -t 6 Sm_v7_nohap.fa {12}_1.fastq.gz {12}_2.fastq.gz | samtools sort -@6 {1}.bam -" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+parallel --dry-run --colsep '\t' "bwa mem -t 6 Sm_v7_nohap.fa {12}_1.fastq.gz {12}_2.fastq.gz | samtools sort -@6 {1}.bam -" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep "gz")
 
 #The parallel command will write each mapping command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. For example:
 
@@ -62,14 +62,14 @@ bwa mem -t 6 ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa ERR3173238_1.fastq.gz E
 ```
 ### Mark PCR duplicates
 ```
-parallel --dry-run --colsep '\t' "gatk MarkDuplicates --INPUT {1}.bam --OUTPUT {1}.markdup.bam --METRICS_FILE {1}.metrics.txt" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz" | cut -f1)
+parallel --dry-run --colsep '\t' "gatk MarkDuplicates --INPUT {1}.bam --OUTPUT {1}.markdup.bam --METRICS_FILE {1}.metrics.txt" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep "gz" | cut -f1)
 ```
 The parallel command will write each markduplicate command to screen, which can be run individually or in batches. It will name the output BAM file with the sample name. For example:
 ```
 gatk MarkDuplicates --INPUT PZQ_popgen6472766.bam --OUTPUT PZQ_popgen6472766.markdup.bam --METRICS_FILE PZQ_popgen6472766.metrics.txt
 
 # Index all BAM files
-parallel -j1 --colsep '\t' "samtools index {1}.markdup.bam" <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+parallel -j1 --colsep '\t' "samtools index {1}.markdup.bam" <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep "gz")
 ```
 ### Calculate coverage
 ```
@@ -80,11 +80,11 @@ cut -f1,2 ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa.fai > Sm_v7_nohap.txt
 bedtools makewindows -g Sm_v7_nohap.txt -w 25000 > Sm_v7_nohap.25kb.bed
 
 # Calculate per-sample coverage
-parallel "coverageBed -a Sm_v7_nohap.25kb.bed -b {1}.markdup.bam > {1}.cov" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+parallel "coverageBed -a Sm_v7_nohap.25kb.bed -b {1}.markdup.bam > {1}.cov" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep "gz")
 
 # Name and merge output
 parallel "awk '{print \$1,\$2,\$3,\$4,FILENAME}' {1}.cov | sed 's/.cov//g' | sed 's/SM_V7_//g' | sed 's/ZW/Z/g' > {1}.renamed.cov" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
-cat *.renamed.cov > all.renamed.cov
+cat *.renamed.cov > median.coverage.txt
 ```
 ## 04 - Variant calling <a name="variantcalling"></a>
 
@@ -93,7 +93,7 @@ cat *.renamed.cov > all.renamed.cov
 cd ${WORKING_DIR}/04_VCALLING
 
 # Variant call each sample
-parallel --dry-run "gatk HaplotypeCaller --emit-ref-confidence GVCF -I ${WORKING_DIR}/03_MAPPING/{1}.remarkdup.bam -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa -O {1}.g.vcf" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+parallel --dry-run "gatk HaplotypeCaller --emit-ref-confidence GVCF -I ${WORKING_DIR}/03_MAPPING/{1}.remarkdup.bam -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa -O {1}.g.vcf" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep "gz")
 
 #For example:
 samtools index PZQ_popgen6472766
@@ -101,12 +101,12 @@ gatk HaplotypeCaller --emit-ref-confidence GVCF -I /lustre/scratch118/infgen/tea
 ```
 ### Rename samples in each gVCF
 ```
-parallel --dry-run --colsep '\t' "gatk RenameSampleInVcf --INPUT {1}.g.vcf --OUTPUT {1}.renamed.g.vcf --NEW_SAMPLE_NAME {1}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+parallel --dry-run --colsep '\t' "gatk RenameSampleInVcf --INPUT {1}.g.vcf --OUTPUT {1}.renamed.g.vcf --NEW_SAMPLE_NAME {1}" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep "gz")
 ```
 ### Combine all samples into a single gVCF and genotype
 ```
 # Create and list of arguments for input into CombineGVCFs
-parallel -j1 --colsep '\t' "echo '--INPUT {1}.renamed.g.vcf'" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz" | cut -f1) > argument.list
+parallel -j1 --colsep '\t' "echo '--INPUT {1}.renamed.g.vcf'" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep "gz" | cut -f1) > argument.list
 
 # Combine gVCFs
 gatk CombineGVCFs --arguments_file argument.list --reference ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --output merged_all_samples.g.vcf
@@ -119,7 +119,7 @@ gatk GenotypeGVCFs --reference ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --var
 ### Calculate quality scores for all variant sites
 ```
 # Produce a table of quality scores for each variant site
-gatk VariantsToTable --variant merged_all_samples.vcf -F CHROM -F POS -F TYPE -F QD -F FS -F MQ -F MQRankSum -F ReadPosRankSum -F SOR -F InbreedingCoeff -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --output cohort.genotyped.tbl
+gatk VariantsToTable --variant merged_all_samples.vcf -F CHROM -F POS -F TYPE -F QD -F FS -F MQ -F MQRankSum -F ReadPosRankSum -F SOR -F InbreedingCoeff -R ${WORKING_DIR}/01_REFERENCES/Sm_v7_nohap.fa --output cohort.genotyped.txt
 
 ```
 ### Separate and filter SNPs
