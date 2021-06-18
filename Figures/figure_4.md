@@ -18,7 +18,7 @@ library("reshape2")
 library("lattice")
 
 # Load metadata
-key <- read.table("supplementary_table_2.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
+key <- read.table("supplementary_table_10.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
 ```
 ## Setup <a name="figure2a"></a>
 ```{r}
