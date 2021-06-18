@@ -218,6 +218,11 @@ parallel --dry-run "pixy --stats fst
 --outfile_prefix output/pixy.{1}.25000.district" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
 
 cat pixy.SM_V7_*.25000.district_fst.txt | grep -v pop | cat fst.header - > fst.district.txt 
+
+# RUN VCFtools (alternative to PIXY for FST calculations
+
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --weir-fst-pop MAYUGE.list --weir-fst-pop TORORO.list --fst-window-size 2000 --out MAYUGE_TORORO_2000.windowed.weir.txt
+
 ```
 ___
 ## 03 - Association <a name="association"></a>
