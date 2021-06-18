@@ -19,7 +19,7 @@ gff <- read.table("genes.bed", header=FALSE)
 # Load per-site Pi values
 pi_MAY <- read.table("MAYUGE_SITE_PI.sites.pi.txt", header=TRUE)
 pi_TOR <- read.table("KOCOGE_SITE_PI.sites.pi.txt", header=TRUE)
-# Load coverage in 2kb windows
+# Load coverage in 5kb windows
 site_cov_ALL <- read.table("coverage_5kb.windows.txt", header=FALSE)
 # Load median per sample coverage
 sample_cov <- read.table("median.sample.coverage.txt", header=TRUE)
@@ -143,7 +143,7 @@ PI_BOTH_4 <- ggplot() +
     axis.text.y=element_text(size=7, color="black", face="bold"),
     axis.title.x=element_blank())
 ```
-## Plot coverage across regions (in 2 kb windows)
+## Plot coverage across regions (in 5 kb windows)
 ```{r}
 cov_site_4 <- ggplot() + 
   geom_pointrange(data=subset(df.cov.summary,V1.x=="SM_V7_5" & V2>16500000 & V2<20500000), 
