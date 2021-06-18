@@ -40,7 +40,7 @@ seqtk subseq schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa <(grep "Retained" 
 # Create indexes and a sequence dictionary for the reference genome
 bwa index Sm_v7_nohap.fa
 
-samtools faidx Sm_v7_nohap.fa
+samtools faidx Sm_v7_nohap.fafsu
 
 gatk CreateSequenceDictionary --REFERENCE Sm_v7_nohap.fa
 ```
@@ -83,7 +83,7 @@ bedtools makewindows -g Sm_v7_nohap.txt -w 25000 > Sm_v7_nohap.25kb.bed
 parallel "coverageBed -a Sm_v7_nohap.25kb.bed -b {1}.markdup.bam > {1}.cov" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep "gz")
 
 # Name and merge output
-parallel "awk '{print \$1,\$2,\$3,\$4,FILENAME}' {1}.cov | sed 's/.cov//g' | sed 's/SM_V7_//g' | sed 's/ZW/Z/g' > {1}.renamed.cov" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz")
+parallel "awk '{print \$1,\$2,\$3,\$4,FILENAME}' {1}.cov | sed 's/.cov//g' | sed 's/SM_V7_//g' | sed 's/ZW/Z/g' > {1}.renamed.cov" :::: <(cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep "gz")
 cat *.renamed.cov > median.coverage.txt
 ```
 ## 04 - Variant calling <a name="variantcalling"></a>
