@@ -32,16 +32,12 @@ plink2 --bfile autosomes_unfiltered --allow-extra-chr --set-all-var-ids @_# --ex
 ### Principal component analysis
 ```
 plink2 --bfile prunedData --allow-extra-chr --set-all-var-ids @_# --pca
-
-# Output can be passed to figure_2.R
 ```
 ### Neighbour-joining phylogeny
 ```
 # Produce a distance matrix
 plink2 --bfile prunedData --allow-extra-chr --set-all-var-ids @_# --distance square 1-ibs
 paste <( cut -f2 prunedData_tree.mdist.id) prunedData_tree.mdist | cat <(cut -f2 prunedData_tree.mdist.id | tr '\n' '\t' | sed -e '1s/^/\t/g') - > autosomes.mdist
-
-# Output can be passed to figure_2.R
 ```
 ### Admixture
 ```
@@ -66,20 +62,16 @@ admixture -j2 --seed=6127 -B1000 ../prunedData.bed 2 --cv=10
 parallel --dry-run "sed -e 's/^/{1} /g' autosomes.{1}.Q" ::: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
 cat *.Q > admixture_all.txt
 
-# Output can be passed to figure_2.R
-
 # Get a table of CV scores, found in the stdout files (in our case *.o files)
 cat *.o | grep CV | cut -f2 -d "=" | sed 's/)://g' | tr ' ' '\t' > cv_scores.txt
-
-# Output can be passed to supplementary_figure_2.R
 ```
 ### Nucleotide diversity, F<sub>ST</sub> and d<sub>XY</sub>
 ```
 # Create list for each level of population
-cut -f1,2 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ > host.list
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ > school.list
-cut -f1,4 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ > district.list
-cut -f1,3,6 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep -v Kocoge | grep PZQ > treatment.list
+cut -f1,2 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ > host.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ > school.list
+cut -f1,4 ${WORKING_DIR}/00_METADATA/supplementary_table10.txt | grep PZQ > district.list
+cut -f1,3,6 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep -v Kocoge | grep PZQ > treatment.list
 
 # Subset the allsites VCF for each chromosome
 parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.allsites.vcf --chr {} --recode-INFO-all --recode --out PZQ_POPGEN.allsites.{}.vcf" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
@@ -115,12 +107,12 @@ cat pixy.SM_V7_*.5000.host_fst.txt | grep -v pop | cat fst.header > fst.host.txt
 ### Recombination
 ```
 # Create input files for each population
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | grep "Kocoge" > kocoge.list
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | shuf | head -17 > mayuge_1.list
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f mayuge_1.list | shuf | head -17 > mayuge_2.list
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list) | shuf | head -17 > mayuge_3.list
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list) | shuf | head -17 > mayuge_4.list
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list) | shuf | head -17 > mayuge_5.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | grep "Kocoge" > kocoge.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | grep -v "Kocoge" | shuf | head -17 > mayuge_1.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | grep -v "Kocoge" | grep -v -f mayuge_1.list | shuf | head -17 > mayuge_2.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list) | shuf | head -17 > mayuge_3.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list) | shuf | head -17 > mayuge_4.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list) | shuf | head -17 > mayuge_5.list
 
 parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --geno-r2 --out {.} --keep {} --min-r2 0.1 --ld-window-bp 50000 --maf 0.05" ::: kocoge.list mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list mayuge_5.list
 
@@ -130,8 +122,6 @@ parallel "awk '{print $1,$3-$2,$5}' {}.geno.ld | grep -v CHR | tr ' ' '\t' | sor
 # Combine samples from Mayuge district
 cat mayuge_*.median.txt > all.median.mayuge.geno.ld
 mv kocoge.median.txt all.median.kocoge.geno.ld
-
-# Output can be passed to supplementary_figure_6.R
 ```
 ### Kinship
 ```
@@ -178,8 +168,8 @@ parallel --dry-run "java -jar beagle.28Sep18.793.jar gt=PZQ_POPGEN.biallelic.{}.
 ```
 ### Produce subsets for each population
 ```
-cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz" | grep 'Mayuge' | cut -f4 > mayuge.list
-cat ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep "gz" | grep 'Tororo' | cut -f4 > tororo.list
+cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep "gz" | grep 'Mayuge' | cut -f4 > mayuge.list
+cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep "gz" | grep 'Tororo' | cut -f4 > tororo.list
 #EDIT KEEP MISSING VARIANTS
 parallel --dry-run "vcftools --vcf PZQ_POPGEN.biallelic.{}.beagle.vcf.gz --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.{1}.mayuge.vcf --chr {1} --keep {2}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW :::: mayuge.list
 parallel --dry-run "vcftools --vcf PZQ_POPGEN.biallelic.{}.beagle.vcf.gz --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.{1}.tororo.vcf --chr {1} --keep {2}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW ::: tororo.list
@@ -198,8 +188,6 @@ parallel --dry-run "sed -e 's/^/{1}\t/g' {1}.{2}.ihs.out.100bins.norm > {1}.{2}.
 
 cat *.mayuge.ihs.out.100bins.norm.temp | sed 's/SM_V7_//g' > mayuge.ihs.out.100bins.norm.all
 cat *.tororo.ihs.out.100bins.norm.temp | sed 's/SM_V7_//g' > tororo.ihs.out.100bins.norm.all
-
-# Output can be passed to figure_3.R
 ```
 ### Calculate XP-EHH between districts (per chromosome)
 ```
@@ -215,8 +203,6 @@ head -1 SM_V7_7.xpehh.out.norm | sed -e '1s/id/chromosome\tid/g'  > header.xpehh
 parallel --dry-run "sed -e 's/^/{1}\t/g' {}.xpehh.out.norm > {}.xpehh.out.norm.temp" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW 
 
 cat *.xpehh.out.norm.temp > xpehh.out.norm.all
-
-# Output can be passed to figure_3.R
 ```
 ### Calculate FST between districts (per chromosome)
 ```
@@ -232,15 +218,13 @@ parallel --dry-run "pixy --stats fst
 --outfile_prefix output/pixy.{1}.25000.district" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
 
 cat pixy.SM_V7_*.25000.district_fst.txt | grep -v pop | cat fst.header - > fst.district.txt 
-
-# Output can be passed to figure_3.R
 ```
 ___
 ## 03 - Association <a name="association"></a>
 ```
 # Create phenotype and covariate files
-cut -f1,4 /00_METADATA/supplementary_table_2.txt | grep PZQ | sed -e 's/^/0\t/g' | sed 's/Good_clearers/1/g' | sed 's/Post-treatment/2/g' | grep -v 'Pre' > bin_treatment.pheno
-cut -f1,7 ${WORKING_DIR}/00_METADATA/supplementary_table_2.txt | grep PZQ | sed -e 's/^/0\t/g' > quant_ERR.pheno
+cut -f1,4 /00_METADATA/supplementary_table_10.txt | grep PZQ | sed -e 's/^/0\t/g' | sed 's/Good_clearers/1/g' | sed 's/Post-treatment/2/g' | grep -v 'Pre' > bin_treatment.pheno
+cut -f1,7 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | sed -e 's/^/0\t/g' > quant_ERR.pheno
 cut -f2,3,4,5,6 ${WORKING_DIR}/06_ANALYSIS/01_STRUCTURE/prunedData.eigenvec | grep -v 'PC' | sed -e 's/^/0\t/g' > pca_covar_4.txt
 ```
 ### Binary trait association (Mayuge good vs post-treatment)
@@ -250,8 +234,6 @@ plink --logistic --bfile ${WORKING_DIR}/06_ANALYSIS/01_STRUCTURE/prunedData --al
 
 # Fix output
 cat BIN_assoc_covar4_mayuge_maf.logistic.adjusted | tr -s ' ' | sed 's/^ //g' | sed -e '2,$s/_/ /' | sed 's/SNP/CHR SNP/g' | tr ' ' '\t' > BIN_assoc_covar4_mayuge_maf.logistic.adjusted.tbl
-
-# Output can be passed to figure_4.R
 ```
 ### Quantitative trait association (Using host ERR values)
 ```
@@ -260,8 +242,6 @@ plink --linear --bfile ${WORKING_DIR}/06_ANALYSIS/01_STRUCTURE/prunedData --allo
 
 # Fix output
 cat ERR_linear_covar4_mayuge_maf.linear.adjusted | tr -s ' ' | sed 's/^ //g' | sed -e '2,$s/_/ /' | sed 's/SNP/CHR SNP/g' | tr ' ' '\t' > ERR_linear_covar4_mayuge_maf.linear.adjusted.tbl
-
-# Output can be passed to figure_4.R
 ```
 ## 04 - Population bottleneck <a name="bottleneck"></a>
 ### Site frequency spectra
