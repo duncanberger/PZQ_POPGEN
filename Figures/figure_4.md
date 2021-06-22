@@ -18,12 +18,12 @@ library("reshape2")
 library("lattice")
 
 # Load metadata
-key <- read.table("supplementary_table_10.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
+key <- read.table("supplementary_data_10.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
 ```
 ## Setup <a name="figure2a"></a>
 ```{r}
 # Load data
-windows <- read.table("Sm_v7_nohap.fa.bed", header=FALSE)
+windows <- read.table("sm_2000.bed", header=FALSE)
 names(windows) <- c("CHROM","BIN_START", "BIN_STOP")
 
 # Set ggplot themes and palettes
