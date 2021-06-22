@@ -1,6 +1,12 @@
-# Supplementary figure 18: Selection statistics over candidate regions of selection
+# Supplementary Figure 18: Selection statistics over a non-candidate regions of selection
 ## Load themes
 ```{r}
+# Load required packages
+library("dplyr")
+library("cowplot")
+library("ggplot2")
+library("reshape2")
+
 selection_theme <- theme(
   legend.position="none",
   panel.grid = element_blank(),
@@ -42,7 +48,7 @@ df.cov.summary <- merged_cov2 %>%
   )
 df.cov.summary
 ```
-## Plot FST
+## Plot F<sub>ST</sub>
 ```{r}
 fst_sites$COLOR <- ifelse(fst_sites$CHROM == "SM_V7_1","A",
                           ifelse(fst_district_2$CHROM == "SM_V7_3","A",
