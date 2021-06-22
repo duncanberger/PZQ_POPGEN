@@ -20,7 +20,7 @@ library("ggtree")
 library("phangorn")
 
 # Load metadata
-key <- read.table("supplementary_table_10.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
+key <- read.table("supplementary_data_10.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
 ```
 ## Figure 2A: Principal component analysis <a name="figure2a"></a>
 ```{r}
@@ -150,8 +150,6 @@ autosome_5kb_schools_dxy <- read.table("dxy.school.txt", header=TRUE)
 autosome_5kb_schools_dxy_1 <- subset(autosome_5kb_schools, avg_dxy!="NaN" & no_snps>125)
 
 # Subset for each combination (currently tediously hard coded, might address later)
-
-
 autosome_5kb_schools_dxy_1_Bugoto_Kocoge <- subset(autosome_5kb_schools_dxy_1, pop1=="Bugoto" & pop2=="Kocoge")
 autosome_5kb_schools_dxy_1_Bwondha_Kocoge <- subset(autosome_5kb_schools_dxy_1, pop2=="Bwondha" & pop1=="Kocoge")
 autosome_5kb_schools_dxy_1_Musubi_Kocoge <- subset(autosome_5kb_schools_dxy_1, pop1=="Musubi" & pop2=="Kocoge")
