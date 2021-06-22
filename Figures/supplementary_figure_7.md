@@ -1,4 +1,4 @@
-## Supplementary Figure 7: Inference of demographic history using SMC++ for *Schistosoma mansoni* subpopulations
+# Supplementary Figure 7: Inference of demographic history using SMC++ for *Schistosoma mansoni* subpopulations. 
 # Setup <a name="setup"></a>
 ```{r}
 # Load required packages
