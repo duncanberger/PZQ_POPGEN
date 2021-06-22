@@ -1,4 +1,4 @@
-# Supplementary figure 4: S. mansoni population structure in Uganda.
+# Supplementary figure 4: *S. mansoni population* structure in Uganda.
 ## Setup <a name="setup"></a>
 ```{r}
 # Load required packages
@@ -8,7 +8,7 @@ library("reshape2")
 # Load metadata
 key <- read.table("supplementary_table_10.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
 ```
-## Figure 2A: Principal component analysis <a name="figure2a"></a>
+## Figure 2A: Principal component analysis
 ```{r}
 # Create a theme and palette
 PCA_theme <- theme(axis.title=element_text(face="bold",size=9),
@@ -21,8 +21,8 @@ PCA_theme <- theme(axis.title=element_text(face="bold",size=9),
                    legend.title=element_blank())
 
 # Load data (same input as supplementary figure 3)
-eigenvec <- read.delim("prunedData_mira.eigenvec", header=TRUE, sep="\t")
-eigenval <- read.delim("prunedData_mira.eigenval", sep="\t", header=FALSE)
+eigenvec <- read.delim("prunedData.eigenvec", header=TRUE, sep="\t")
+eigenval <- read.delim("prunedData.eigenval", sep="\t", header=FALSE)
 eigenvec_merged <- (merge(key, eigenvec, all=TRUE, by.y = "IID", by.x='sample_ID'))
 
 # Calculate contribution of each eigenvalue to total variance
@@ -37,7 +37,7 @@ sum_eigenval<-lapply(eigenval$V1,function(x){
 ```{r}
 # Plot first two principal components, color points by host
 sfig_4_A1 <- ggplot(eigenvec_merged, aes((PC1),(PC2))) + 
-  geom_point(size=0.75, aes(color=patient_id, fill=patient_id)) +
+  geom_point(size=0.75, aes(color=sample_ID, fill=sample_ID)) +
   xlab(paste0("PC1 (",sum_eigenval[[1]],"%)")) + 
   ylab(paste0("PC2 (",sum_eigenval[[2]],"%)")) + 
   scale_shape_manual(values=c(21,23,22,24)) +
@@ -47,7 +47,7 @@ sfig_4_A1 <- ggplot(eigenvec_merged, aes((PC1),(PC2))) +
 
 # Plot first third and fourth principal components, color points by host
 sfig_4_A2 <- ggplot(eigenvec_merged, aes((PC3),(PC4))) + 
-  geom_point(size=0.75, aes(color=patient_id, fill=patient_id)) +
+  geom_point(size=0.75, aes(color=sample_ID, fill=sample_ID)) +
   xlab(paste0("PC3 (",sum_eigenval[[3]],"%)")) + 
   ylab(paste0("PC4 (",sum_eigenval[[4]],"%)")) + 
   scale_color_manual(values=pca_palette)+
