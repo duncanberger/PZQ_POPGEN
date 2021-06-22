@@ -6,7 +6,7 @@ library(ggplot2)
 library(reshape2)
 
 # Load data
-pid <- read.table("supplementary_table_9.txt", sep="\t", header=TRUE)
+pid <- read.table("supplementary_data_9.txt", sep="\t", header=TRUE)
 
 # Create color palette
 pca_palette <- c("#56B4E9", "#009e73","#E69f00","#CC79A7")
