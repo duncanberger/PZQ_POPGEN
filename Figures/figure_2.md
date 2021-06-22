@@ -81,7 +81,7 @@ mdist <- as.matrix(read.table("autosomes.mdist", sep="\t", header=TRUE, row.name
 nj_tree <- (nj(mdist))
 
 # Plot tree
-tree <- ggtree(tree.test, layout="circular", aes(color=Site)) %<+% key +
+tree <- ggtree(nj_tree, layout="circular", aes(color=Site)) %<+% key +
   scale_color_manual(values=pca_palette, na.value='grey50')+
   geom_treescale(x=0.02, color='grey50', offset = 0.8,width = 0.025)
 ```
