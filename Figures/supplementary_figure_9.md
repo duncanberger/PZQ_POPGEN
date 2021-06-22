@@ -1,4 +1,4 @@
-# Supplementary figure 9: Identification of sex of all samples using differential depth of coverage
+# Supplementary Figure 9: Identification of sex of all samples using differential depth of coverage.
 ## Import and reorder data
 ```{r}
 sex <- read.table("sexing.csv", header=TRUE, sep=',')
