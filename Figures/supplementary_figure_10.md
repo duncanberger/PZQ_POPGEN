@@ -1,4 +1,4 @@
-# Supplementary Figure 10: Genome-wide allele frequency patterns
+# Supplementary Figure 10: Genome-wide allele frequency patterns.
 ## Load and group SFS data
 ```{r}
 sfs <-read.csv("sfs.csv", header=TRUE)
