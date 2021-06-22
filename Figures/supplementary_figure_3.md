@@ -1,4 +1,4 @@
-# Supplementary Figure 3: S. mansoni population structure in Uganda (miracidia only)
+# Supplementary Figure 3: *Schistosoma mansoni" population structure in Uganda (miracidia only)
 
 ## Setup <a name="setup"></a>
 ```{r}
@@ -13,9 +13,9 @@ library("ggtree")
 library("phangorn")
 
 # Load metadata
-key <- read.table("supplementary_table_10.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
+key <- read.table("supplementary_data_10.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
 ```
-## Supplementary Figure 3A: Principal component analysis <a name="figure2a"></a>
+## Supplementary Figure 3A: Principal component analysis
 ```{r}
 # Create a theme and palette
 PCA_theme <- theme(axis.title=element_text(face="bold",size=9),
@@ -29,8 +29,8 @@ PCA_theme <- theme(axis.title=element_text(face="bold",size=9),
 pca_palette <- c("#56B4E9", "#009e73","#CC79A7","#E69f00")
 
 # Load data and merge with metadata (produced using same method as Fig 2a just subset to miracidia only
-eigenvec <- read.delim("prunedData_mira.eigenvec", header=TRUE, sep="\t")
-eigenval <- read.delim("prunedData_mira.eigenval", sep="\t", header=FALSE)
+eigenvec <- read.delim("prunedData.eigenvec", header=TRUE, sep="\t")
+eigenval <- read.delim("prunedData.eigenval", sep="\t", header=FALSE)
 eigenvec_merged <- (merge(key, eigenvec, all=TRUE, by.y = "IID", by.x='sample_ID'))
 
 # Calculate contribution of each eigenvalue to total variance
@@ -68,13 +68,13 @@ pc3_pc4 <- ggplot(eigenvec_merged, aes((PC3),(PC4))) +
 ## Supplementary Figure 3B: Mid-point rooted neighbour-joining tree <a name="figure2b"></a>
 ```{r}
 # Load distance matrix (produced using same method as Fig 2c just with subset of population)
-mdist <- as.matrix(read.table("autosomes.mira.mdist", sep="\t", header=TRUE, row.names=1))
+mdist <- as.matrix(read.table("pruned_data.mdist.csv", sep="\t", header=TRUE, row.names=1))
 
 # Neighbor-joining tree estimation
 nj_tree <- (nj(mdist))
 
 # Plot tree
-tree <- ggtree(tree.test, layout="circular", aes(color=Site)) %<+% key +
+tree <- ggtree(nj_tree, layout="circular", aes(color=Site)) %<+% key +
   scale_color_manual(values=pca_palette, na.value='grey50')+
   geom_treescale(x=0.02, color='grey50', offset = 0.8,width = 0.025)
 ```
