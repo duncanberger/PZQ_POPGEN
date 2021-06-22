@@ -1,4 +1,4 @@
-# Figure 2: S. mansoni population structure in Uganda
+# Figure 2: *Schistosoma mansoni* population structure
 
 0. [Setup](#setup)
 1. [Figure 2A](#figure2a)
