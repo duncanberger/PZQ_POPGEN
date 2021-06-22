@@ -1,4 +1,4 @@
-# Supplementary Figure 18: Selection statistics over a non-candidate regions of selection
+# Supplementary Figure 18: Selection statistics over a non-candidate region
 ## Load themes
 ```{r}
 # Load required packages
