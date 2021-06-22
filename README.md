@@ -1,6 +1,6 @@
 # Population genomics of *Schistosoma mansoni* reveals extensive diversity with limited selection despite repeated mass drug administration
 
-This repository contains the data and the analysis workflow for the manuscript "Population genomics of *Schistosoma mansoni* reveals extensive diversity with limited recent selection despite repeated mass drug administration".
+This repository contains the data and the analysis workflow for the manuscript "Population genomics of *Schistosoma mansoni* reveals extensive diversity with limited recent selection despite repeated mass drug administration". 
 
 The repository is divided into 3 sections:
 
