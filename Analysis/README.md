@@ -168,8 +168,8 @@ parallel --dry-run "java -jar beagle.28Sep18.793.jar gt=PZQ_POPGEN.biallelic.{}.
 ```
 ### Produce subsets for each population
 ```
-cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep "gz" | grep 'Mayuge' | cut -f4 > mayuge.list
-cat ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep "gz" | grep 'Tororo' | cut -f4 > tororo.list
+cat ${WORKING_DIR}/00_METADATA/supplementary_data_10.txt | grep "gz" | grep 'Mayuge' | cut -f4 > mayuge.list
+cat ${WORKING_DIR}/00_METADATA/supplementary_data_10.txt | grep "gz" | grep 'Tororo' | cut -f4 > tororo.list
 #EDIT KEEP MISSING VARIANTS
 parallel --dry-run "vcftools --vcf PZQ_POPGEN.biallelic.{}.beagle.vcf.gz --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.{1}.mayuge.vcf --chr {1} --keep {2}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW :::: mayuge.list
 parallel --dry-run "vcftools --vcf PZQ_POPGEN.biallelic.{}.beagle.vcf.gz --recode --recode-INFO-all --out PZQ_POPGEN.biallelic.{1}.tororo.vcf --chr {1} --keep {2}" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW ::: tororo.list
