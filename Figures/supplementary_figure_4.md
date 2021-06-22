@@ -1,4 +1,4 @@
-# Supplementary figure 4: *Schistosoma mansoni* population structure in Uganda (miracidia only)
+# Supplementary Figure 4: Population structure in *Schistosoma mansoni* samples from Uganda overlaid with host or drug treatment-phenotype details.
 ## Setup <a name="setup"></a>
 ```{r}
 # Load required packages
