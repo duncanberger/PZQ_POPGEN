@@ -204,7 +204,7 @@ parallel --dry-run "sed -e 's/^/{1}\t/g' {}.xpehh.out.norm > {}.xpehh.out.norm.t
 
 cat *.xpehh.out.norm.temp > ALL.MAYUGEvsTORORO.xpehh.xpehh.out.norm.txt
 ```
-### Calculate F</sub>ST<sub> between districts (per chromosome)
+### Calculate F<sub>ST</sub> between districts (per chromosome)
 ```
 # Run PIXY (described above too, the specific command is)
 parallel --dry-run "pixy --stats fst 
@@ -219,9 +219,19 @@ parallel --dry-run "pixy --stats fst
 
 cat pixy.SM_V7_*.2000.district_fst.txt | grep -v pop | cat fst.header - > fst.district.txt 
 
-# RUN VCFtools (alternative to PIXY for F<sub>ST</sub> calculations
+# RUN VCFtools (alternative to PIXY for FST calculations) for between district comparisons
 
 vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --weir-fst-pop MAYUGE.list --weir-fst-pop TORORO.list --fst-window-size 2000 --out MAYUGE_TORORO_2000.windowed.weir.txt
+
+# RUN VCFtools (alternative to PIXY for FST calculations) for between treatment comparisons
+
+vcftools --vcf PZQ_POPGEN.vcf --weir-fst-pop PRE_TREATMENT.list --weir-fst-pop GOOD_CLEARERS_MAYUGE.list --out PRE_GOOD_2kb --fst-window-size 2000
+vcftools --vcf PZQ_POPGEN.vcf --weir-fst-pop POST_TREATMENT.list --weir-fst-pop GOOD_CLEARERS_MAYUGE.list --out POST_GOOD_2kb --fst-window-size 2000
+vcftools --vcf PZQ_POPGEN.vcf --weir-fst-pop PRE_TREATMENT.list --weir-fst-pop POST_TREATMENT.list --out PRE_POST_2kb --fst-window-size 2000
+
+sed 's/$/  POST_GOOD/g' POST_GOOD_2kb.windowed.weir.fst >> fst.windows.2kb.treatment.txt
+sed 's/$/  PRE_GOOD/g' PRE_GOOD_2kb.windowed.weir.fst >> fst.windows.2kb.treatment.txt
+sed 's/$/  PRE_POST/g' PRE_POST_2kb.windowed.weir.fst >> fst.windows.2kb.treatment.txt
 ```
 ___
 ## 03 - Association <a name="association"></a>
