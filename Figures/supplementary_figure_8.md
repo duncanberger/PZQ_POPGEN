@@ -1,3 +1,4 @@
+# Supplementary Figure 8: Diversity of infrapopulations.
 ## Load libraries
 ```{r}
 library(dplyr)
