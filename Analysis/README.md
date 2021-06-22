@@ -227,8 +227,8 @@ ___
 ## 03 - Association <a name="association"></a>
 ```
 # Create phenotype and covariate files
-cut -f1,4 /00_METADATA/supplementary_table_10.txt | grep PZQ | sed -e 's/^/0\t/g' | sed 's/Good_clearers/1/g' | sed 's/Post-treatment/2/g' | grep -v 'Pre' > bin_treatment.pheno
-cut -f1,7 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | sed -e 's/^/0\t/g' > quant_ERR.pheno
+cut -f1,4 /00_METADATA/supplementary_data_10.txt | grep PZQ | sed -e 's/^/0\t/g' | sed 's/Good_clearers/1/g' | sed 's/Post-treatment/2/g' | grep -v 'Pre' > bin_treatment.pheno
+cut -f1,7 ${WORKING_DIR}/00_METADATA/supplementary_data_10.txt | grep PZQ | sed -e 's/^/0\t/g' > quant_ERR.pheno
 cut -f2,3,4,5,6 ${WORKING_DIR}/06_ANALYSIS/01_STRUCTURE/prunedData.eigenvec | grep -v 'PC' | sed -e 's/^/0\t/g' > pca_covar_4.txt
 ```
 ### Binary trait association (Mayuge good vs post-treatment)
