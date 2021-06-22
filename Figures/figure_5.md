@@ -18,7 +18,7 @@ library("scales")
 library("dplyr")
 
 # Load metadata
-key <- read.table("supplementary_table_10.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
+key <- read.table("supplementary_data_10.txt", header=TRUE, sep="\t", check.names = FALSE, comment.char = "")
 scaleFUN <- function(x) sprintf("%.1f", x)
 
 ```
