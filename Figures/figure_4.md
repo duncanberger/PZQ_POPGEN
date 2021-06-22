@@ -1,5 +1,4 @@
-# Figure 4: Signatures of recent selection
-
+# Figure 4: Signatures of recent selection. 
 0. [Setup](#setup)
 1. [Figure 4A](#figure4a)
 2. [Figure 4B](#figure4b)
