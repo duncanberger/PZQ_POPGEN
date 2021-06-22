@@ -1,4 +1,4 @@
-# The decay of linkage disequilibrium
+# Supplementary Figure 19: The decay of linkage disequilibrium as the squared correlation of allele frequency (r^2) against distance (bp)
 ```{r}
 # Load libraries
 library(dplyr)
