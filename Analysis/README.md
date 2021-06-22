@@ -68,10 +68,10 @@ cat *.o | grep CV | cut -f2 -d "=" | sed 's/)://g' | tr ' ' '\t' > cv_scores.txt
 ### Nucleotide diversity, F<sub>ST</sub> and d<sub>XY</sub>
 ```
 # Create list for each level of population
-cut -f1,2 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ > host.list
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ > school.list
-cut -f1,4 ${WORKING_DIR}/00_METADATA/supplementary_table10.txt | grep PZQ > district.list
-cut -f1,3,6 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep -v Kocoge | grep PZQ > treatment.list
+cut -f1,2 ${WORKING_DIR}/00_METADATA/supplementary_data_10.txt | grep PZQ > host.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_data_10.txt | grep PZQ > school.list
+cut -f1,4 ${WORKING_DIR}/00_METADATA/supplementary_data_10.txt | grep PZQ > district.list
+cut -f1,3,6 ${WORKING_DIR}/00_METADATA/supplementary_data_10.txt | grep -v Kocoge | grep PZQ > treatment.list
 
 # Subset the allsites VCF for each chromosome
 parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.allsites.vcf --chr {} --recode-INFO-all --recode --out PZQ_POPGEN.allsites.{}.vcf" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
@@ -93,26 +93,26 @@ head -1 pixy.SM_V7_1.5000.school_dxy.txt > dxy.header
 head -1 pixy.SM_V7_1.5000.school_pi.txt > pi.header
 
 # Combine files for each chromosome
-cat pixy.SM_V7_*.5000.school_pi.txt | grep -v pop | cat pi.header - > pi.school.txt 
-cat pixy.SM_V7_*.5000.host_pi.txt | grep -v pop | cat pi.header - > pi.host.txt 
-cat pixy.SM_V7_*.5000.treatment_pi.txt | grep -v pop | cat pi.header - > pi.treatment.txt
-cat pixy.SM_V7_*.5000.school_fst.txt | grep -v pop | cat fst.header - > fst.school.txt 
-cat pixy.SM_V7_*.5000.school_dxy.txt | grep -v pop | cat dxy.header - > dxy.school.txt 
-cat pixy.SM_V7_*.5000.treatment_fst.txt | grep -v pop | cat fst.header - > fst.treatment.txt 
-cat pixy.SM_V7_*.5000.treatment_dxy.txt | grep -v pop | cat dxy.header - > dxy.treatment.txt 
-cat pixy.SM_V7_*.5000.treatment_fst.txt | grep -v pop | cat fst.header - > fst.treatment.5kb.txt 
-cat pixy.SM_V7_*.2000.treatment_fst.txt | grep -v pop | cat fst.header - > fst.treatment.2kb.txt 
-cat pixy.SM_V7_*.5000.host_fst.txt | grep -v pop | cat fst.header > fst.host.txt 
+cat pixy.SM_V7_*.5000.school_pi.txt | grep -v pop | cat pi.header - | grep -v ZW  > all.pi.pixy.schools.txt
+cat pixy.SM_V7_*.5000.host_pi.txt | grep -v pop | cat pi.header - | grep -v ZW > pi.host.txt 
+cat pixy.SM_V7_*.5000.treatment_pi.txt | grep -v pop | cat pi.header - | grep -v ZW > all.pi.treat.fix.txt
+cat pixy.SM_V7_*.5000.school_fst.txt | grep -v pop | cat fst.header - | grep -v ZW > autosomes.fst.5kb.schools.txt
+cat pixy.SM_V7_*.5000.school_dxy.txt | grep -v pop | cat dxy.header - | grep -v ZW  > autosomes.dxy.5kb.schools.txt 
+cat pixy.SM_V7_*.5000.treatment_fst.txt | grep -v pop | cat fst.header - | grep -v ZW > fst.treatment.txt 
+cat pixy.SM_V7_*.5000.treatment_dxy.txt | grep -v pop | cat dxy.header - | grep -v ZW > autosomes.dxy.5kb.treatment.txt 
+cat pixy.SM_V7_*.5000.treatment_fst.txt | grep -v pop | cat fst.header - | grep -v ZW > autosomes.fst.5kb.treatment.txt
+cat pixy.SM_V7_*.2000.treatment_fst.txt | grep -v pop | cat fst.header - | grep -v ZW > fst.treatment.2kb.txt 
+cat pixy.SM_V7_*.5000.host_fst.txt | grep -v pop | cat fst.header | grep -v ZW > fst.host.txt 
 ```
 ### Recombination
 ```
 # Create input files for each population
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | grep "Kocoge" > kocoge.list
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | grep -v "Kocoge" | shuf | head -17 > mayuge_1.list
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | grep -v "Kocoge" | grep -v -f mayuge_1.list | shuf | head -17 > mayuge_2.list
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list) | shuf | head -17 > mayuge_3.list
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list) | shuf | head -17 > mayuge_4.list
-cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_table_10.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list) | shuf | head -17 > mayuge_5.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_data_10.txt | grep PZQ | grep "Kocoge" > kocoge.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_data_10.txt | grep PZQ | grep -v "Kocoge" | shuf | head -17 > mayuge_1.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_data_10.txt | grep PZQ | grep -v "Kocoge" | grep -v -f mayuge_1.list | shuf | head -17 > mayuge_2.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_data_10.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list) | shuf | head -17 > mayuge_3.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_data_10.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list) | shuf | head -17 > mayuge_4.list
+cut -f1,3 ${WORKING_DIR}/00_METADATA/supplementary_data_10.txt | grep PZQ | grep -v "Kocoge" | grep -v -f <(cat mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list) | shuf | head -17 > mayuge_5.list
 
 parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --geno-r2 --out {.} --keep {} --min-r2 0.1 --ld-window-bp 50000 --maf 0.05" ::: kocoge.list mayuge_1.list mayuge_2.list mayuge_3.list mayuge_4.list mayuge_5.list
 
@@ -120,8 +120,8 @@ parallel --dry-run "vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.
 parallel "awk '{print $1,$3-$2,$5}' {}.geno.ld | grep -v CHR | tr ' ' '\t' | sort -k1,1 -k2,2 | datamash -g 1,2 median 3 > {}.median.txt" ::: mayuge_1 mayuge_2 mayuge_3 mayuge_4 mauge_5 kocoge
 
 # Combine samples from Mayuge district
-cat mayuge_*.median.txt > all.median.mayuge.geno.ld
-mv kocoge.median.txt all.median.kocoge.geno.ld
+cat mayuge_*.median.txt > mayuge_median.ld
+mv kocoge.median.txt kocoge_median.ld.txt
 ```
 ### Kinship
 ```
@@ -186,8 +186,8 @@ norm --ihs --files SM_V7_1.tororo.ihs.out SM_V7_2.tororo.ihs.out SM_V7_3.tororo.
 # Add chromosome names to normalized IHS results
 parallel --dry-run "sed -e 's/^/{1}\t/g' {1}.{2}.ihs.out.100bins.norm > {1}.{2}.ihs.out.100bins.norm.temp" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW ::: mayuge tororo
 
-cat *.mayuge.ihs.out.100bins.norm.temp | sed 's/SM_V7_//g' > mayuge.ihs.out.100bins.norm.all
-cat *.tororo.ihs.out.100bins.norm.temp | sed 's/SM_V7_//g' > tororo.ihs.out.100bins.norm.all
+cat *.mayuge.ihs.out.100bins.norm.temp | sed 's/SM_V7_//g' > ALL.MAYUGE.IHS.ihs.out.100bins.norm.txt
+cat *.tororo.ihs.out.100bins.norm.temp | sed 's/SM_V7_//g' > ALL.TORORO.IHS.ihs.out.100bins.norm.txt
 ```
 ### Calculate XP-EHH between districts (per chromosome)
 ```
@@ -202,9 +202,9 @@ head -1 SM_V7_7.xpehh.out.norm | sed -e '1s/id/chromosome\tid/g'  > header.xpehh
 # Add chromosome names to normalised XP-EHH results
 parallel --dry-run "sed -e 's/^/{1}\t/g' {}.xpehh.out.norm > {}.xpehh.out.norm.temp" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW 
 
-cat *.xpehh.out.norm.temp > xpehh.out.norm.all
+cat *.xpehh.out.norm.temp > ALL.MAYUGEvsTORORO.xpehh.xpehh.out.norm.txt
 ```
-### Calculate FST between districts (per chromosome)
+### Calculate F</sub>ST<sub> between districts (per chromosome)
 ```
 # Run PIXY (described above too, the specific command is)
 parallel --dry-run "pixy --stats fst 
@@ -217,12 +217,11 @@ parallel --dry-run "pixy --stats fst
 --invariant_filter_expression 'DP>=10,RGQ>=20' 
 --outfile_prefix output/pixy.{1}.25000.district" ::: SM_V7_1 SM_V7_2 SM_V7_3 SM_V7_4 SM_V7_5 SM_V7_6 SM_V7_7 SM_V7_ZW
 
-cat pixy.SM_V7_*.25000.district_fst.txt | grep -v pop | cat fst.header - > fst.district.txt 
+cat pixy.SM_V7_*.2000.district_fst.txt | grep -v pop | cat fst.header - > fst.district.txt 
 
-# RUN VCFtools (alternative to PIXY for FST calculations
+# RUN VCFtools (alternative to PIXY for F<sub>ST</sub> calculations
 
 vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --weir-fst-pop MAYUGE.list --weir-fst-pop TORORO.list --fst-window-size 2000 --out MAYUGE_TORORO_2000.windowed.weir.txt
-
 ```
 ___
 ## 03 - Association <a name="association"></a>
@@ -238,7 +237,7 @@ cut -f2,3,4,5,6 ${WORKING_DIR}/06_ANALYSIS/01_STRUCTURE/prunedData.eigenvec | gr
 plink --logistic --bfile ${WORKING_DIR}/06_ANALYSIS/01_STRUCTURE/prunedData --allow-extra-chr --allow-no-sex --out BIN_assoc_covar4_mayuge_maf --adjust --covar pca_covar_4.txt --pheno bin_treatment.pheno --set-missing-var-ids @[# --keep mayuge.list --chr 1,2,3,4,5,6,7 --maf 0.05 --keep treatment.list
 
 # Fix output
-cat BIN_assoc_covar4_mayuge_maf.logistic.adjusted | tr -s ' ' | sed 's/^ //g' | sed -e '2,$s/_/ /' | sed 's/SNP/CHR SNP/g' | tr ' ' '\t' > BIN_assoc_covar4_mayuge_maf.logistic.adjusted.tbl
+cat BIN_assoc_covar4_mayuge_maf.logistic.adjusted | tr -s ' ' | sed 's/^ //g' | sed -e '2,$s/_/ /' | sed 's/SNP/CHR SNP/g' | tr ' ' '\t' > assoc_err_binary.txt
 ```
 ### Quantitative trait association (Using host ERR values)
 ```
@@ -246,7 +245,7 @@ cat BIN_assoc_covar4_mayuge_maf.logistic.adjusted | tr -s ' ' | sed 's/^ //g' | 
 plink --linear --bfile ${WORKING_DIR}/06_ANALYSIS/01_STRUCTURE/prunedData --allow-extra-chr --allow-no-sex --out ERR_linear_covar4_mayuge_maf --adjust --covar pca_covar_4.txt --pheno quant_ERR.pheno --all-pheno --set-missing-var-ids @[# --keep treatment.list --maf 0.05 --chr 1,2,3,4,5,6,7
 
 # Fix output
-cat ERR_linear_covar4_mayuge_maf.linear.adjusted | tr -s ' ' | sed 's/^ //g' | sed -e '2,$s/_/ /' | sed 's/SNP/CHR SNP/g' | tr ' ' '\t' > ERR_linear_covar4_mayuge_maf.linear.adjusted.tbl
+cat ERR_linear_covar4_mayuge_maf.linear.adjusted | tr -s ' ' | sed 's/^ //g' | sed -e '2,$s/_/ /' | sed 's/SNP/CHR SNP/g' | tr ' ' '\t' > assoc_err_linear.txt
 ```
 ## 04 - Population bottleneck <a name="bottleneck"></a>
 ### Site frequency spectra
@@ -275,18 +274,34 @@ parallel "cat REP_{}/dadi/Kocoge-30.sfs | head -2 | tail -1 | tr ' ' '\n' | awk 
 parallel "cat REP_{}/dadi/Bwondha-30.sfs | head -2 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Bwondha\"}'" ::: A B C D E >> sfs_30.list
 parallel "cat REP_{}/dadi/Bugoto-30.sfs | head -2 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Bugoto\"}'" ::: A B C D E >> sfs_30.list
 parallel "cat REP_{}/dadi/Musubi-30.sfs | head -2 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Musubi\"}'" ::: A B C D E >> sfs_30.list
-
+cat sfs_30.list | tr '\t' ',' > sfs.csv
 # And collect residual values
 parallel "cat REP_{}/dadi/Kocoge-30.sfs | head -3 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Kocoge\"}'" ::: A B C D E >> sfs_30_res.list
 parallel "cat REP_{}/dadi/Bwondha-30.sfs | head -3 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Bwondha\"}'" ::: A B C D E >> sfs_30_res.list
 parallel "cat REP_{}/dadi/Bugoto-30.sfs | head -3 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Bugoto\"}'" ::: A B C D E >> sfs_30_res.list
 parallel "cat REP_{}/dadi/Musubi-30.sfs | head -3 | tail -1 | tr ' ' '\n' | awk '{print \$1,NR,\"Musubi\"}'" ::: A B C D E >> sfs_30_res.list
+cat sfs_30_res.list | tr '\t' ',' > sfs_res.csv
 ```
 ### Tajima's D
 ```
-# Calculate Tajima's D for each school subpopulation in 5 kb windows. 
-vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep KOCOGE.list --TajimaD 5000 --out KOCOGE_TAJIMA_D
-vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep MUSUBI.list --TajimaD 5000 --out MUSUBI_TAJIMA_D
-vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep BWONDHA.list --TajimaD 5000 --out BWONDHA_TAJIMA_D
-vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep BUGOTO.list --TajimaD 5000 --out BUGOTO_TAJIMA_D
+# Calculate Tajima's D for each school subpopulation in 2 kb windows. 
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep KOCOGE.list --TajimaD 2000 --out KOCOGE_TAJIMA_D_2000
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep MUSUBI.list --TajimaD 2000 --out MUSUBI_TAJIMA_D_2000
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep BWONDHA.list --TajimaD 2000 --out BWONDHA_TAJIMA_D_2000
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep BUGOTO.list --TajimaD 2000 --out BUGOTO_TAJIMA_D_2000
+  
+cat KOCOGE_TAJIMA_D_2000.Tajima.D | grep -v Taj | awk '{print $1,$2,$3,$4,"Kocoge"}' | sed 's/ / /g' >> KOCOGE_TAJIMA_D.Tajima.D.2kb.txt
+cat BUGOTO_TAJIMA_D_2000.Tajima.D | grep -v Taj | awk '{print $1,$2,$3,$4,"Bugoto"}' | sed 's/ / /g' >> MAYUGE_TAJIMA_D.Tajima.D.2kb.txt
+cat BWONDHA_TAJIMA_D_2000.Tajima.D | grep -v Taj | awk '{print $1,$2,$3,$4,"Bwondha"}' | sed 's/ / /g' >> MAYUGE_TAJIMA_D.Tajima.D.2kb.txt
+cat MUSUBI_TAJIMA_D_2000.Tajima.D | grep -v Taj | awk '{print $1,$2,$3,$4,"Musubi"}' | sed 's/ / /g' >> MAYUGE_TAJIMA_D.Tajima.D.2kb.txt
+
+  # Calculate Tajima's D for each school subpopulation in 5 kb windows. 
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep KOCOGE.list --TajimaD 5000 --out KOCOGE_TAJIMA_D_5000
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep MUSUBI.list --TajimaD 5000 --out MUSUBI_TAJIMA_D_5000
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep BWONDHA.list --TajimaD 5000 --out BWONDHA_TAJIMA_D_5000
+vcftools --vcf ${WORKING_DIR}/06_ANALYSIS/FREEZE/PZQ_POPGEN.vcf --keep BUGOTO.list --TajimaD 5000 --out BUGOTO_TAJIMA_D_5000
+cat KOCOGE_TAJIMA_D_5000.Tajima.D | grep -v Taj | awk '{print $1,$2,$3,$4,"Kocoge"}' | sed 's/ / /g' >> TD.all.txt
+cat BUGOTO_TAJIMA_D_5000.Tajima.D | grep -v Taj | awk '{print $1,$2,$3,$4,"Bugoto"}' | sed 's/ / /g' >> TD.all.txt
+cat BWONDHA_TAJIMA_D_5000.Tajima.D | grep -v Taj | awk '{print $1,$2,$3,$4,"Bwondha"}' | sed 's/ / /g' >> TD.all.txt
+cat MUSUBI_TAJIMA_D_5000.Tajima.D | grep -v Taj | awk '{print $1,$2,$3,$4,"Musubi"}' | sed 's/ / /g' >> TD.all.txt
 ```
