@@ -1,4 +1,4 @@
-# Supplementary figure 11: Median Tajima’s D values for each district population
+# Supplementary Figure 11: Median Tajima’s D values for each district population.
 
 ## Import Tajima's D data for both subpopulations
 ```{r}
