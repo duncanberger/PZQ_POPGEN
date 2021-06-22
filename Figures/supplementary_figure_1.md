@@ -1,4 +1,4 @@
-# Read coverage
+# Supplementary Figure 1: Depth of read coverage
 ```{r}
 # Load libraries
 library(ggplot2)
