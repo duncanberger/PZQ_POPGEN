@@ -1,4 +1,4 @@
-# Supplementary figure 6: Uncertainty in inference of demographic history using SMC++ for *Schistosoma mansoni* subpopulations
+# Supplementary Figure 6: Uncertainty in inference of demographic history using SMC++ for *Schistosoma mansoni* populations. 
 
 ## Import data (SMC++ estimates of demographic history)
 ```{r}
