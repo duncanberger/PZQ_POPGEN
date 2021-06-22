@@ -35,7 +35,7 @@ wget ftp://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS14/species
 gunzip schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa.gz
 
 # Exclude haplotype scaffolds and trim scaffold names
-seqtk subseq schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa <(grep "Retained" ${WORKING_DIR}/00_METADATA/supplementary_table_11.txt | cut -f1 | cat) | cut -f1 -d " " > Sm_v7_nohap.fa
+seqtk subseq schistosoma_mansoni.PRJEA36577.WBPS14.genomic.fa <(grep "Retained" ${WORKING_DIR}/00_METADATA/supplementary_data_11.txt | cut -f1 | cat) | cut -f1 -d " " > Sm_v7_nohap.fa
 
 # Create indexes and a sequence dictionary for the reference genome
 bwa index Sm_v7_nohap.fa
