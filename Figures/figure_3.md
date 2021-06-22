@@ -1,4 +1,4 @@
-# Figure 3: S. mansoni population history
+# Figure 3: Genome-wide allele frequency patterns. 
 ## Figure 3A: 1D-SFS for each school subpopulation
 ### Load and group SFS data
 ```{r}
