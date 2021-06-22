@@ -1,4 +1,4 @@
-# Supplementary figure 14: Selection statistics over candidate regions of selection
+# Supplementary Figure 14: Selection statistics over candidate regions of selection
 ## Load themes
 ```{r}
 # Load required packages
