@@ -36,8 +36,8 @@ PCA_theme <- theme(axis.title=element_text(face="bold",size=9),
 pca_palette <- c("#56B4E9", "#009e73","#CC79A7","#E69f00")
 
 # Load data, produce in STEP X, and merge with metadata
-eigenvec <- read.delim("prunedData.eigenvec", header=TRUE, sep="\t")
-eigenval <- read.delim("prunedData.eigenval", sep="\t", header=FALSE)
+eigenvec <- read.delim("207_PCA.eigenvec", header=TRUE, sep="\t")
+eigenval <- read.delim("207_PCA.eigenval", sep="\t", header=FALSE)
 eigenvec_merged <- (merge(key, eigenvec, all=TRUE, by.y = "IID", by.x='sample_ID'))
 
 # Calculate contribution of each eigenvalue to total variance
@@ -114,13 +114,13 @@ pi_all_ps <- ggplot(data=pi_5kb_schools_subset, aes(x=pop, y=log10(avg_pi), fill
 ### Calculate F<sub>ST</sub> estimates between each population
 ```{r}
 # Load FST scores for all pairwise comparisons between schools
-autosome_5kb_school_fst <- read.table("fst.school.txt", header=TRUE)
+autosome_5kb_school_fst <- read.table("autosomes.fst.5kb.schools.txt", header=TRUE)
 
 # Remove NA values and convert all negative values to 0
 autosome_5kb_school_fst_1 <- subset(autosome_5kb_school_fst, avg_wc_fst!="NaN" & avg_wc_fst!="NA" & no_snps>125)
 autosome_5kb_school_fst_1[autosome_5kb_school_fst_1 < 0] <- 0
 
-# Subset for each combination (currently tediously hard coded, might address later)
+# Subset for each combination
 autosome_5kb_school_fst_1_Bugoto_Kocoge <- subset(autosome_5kb_school_fst_1, pop1=="Bugoto" & pop2=="Kocoge")
 autosome_5kb_school_fst_1_Bwondha_Kocoge <- subset(autosome_5kb_school_fst_1, pop2=="Bwondha" & pop1=="Kocoge")
 autosome_5kb_school_fst_1_Musubi_Kocoge <- subset(autosome_5kb_school_fst_1, pop1=="Musubi" & pop2=="Kocoge")
@@ -144,12 +144,12 @@ quantile(bstrap_medians,c(0.025,0.975))
 ### Calculate d<sub>XY</sub> estimates between each population
 ```{r}
 # Load dXY scores for all pairwise comparisons between schools
-autosome_5kb_schools_dxy <- read.table("dxy.school.txt", header=TRUE)
+autosome_5kb_schools_dxy <- read.table("autosomes.dxy.5kb.schools.txt", header=TRUE)
 
 # Remove NA values
 autosome_5kb_schools_dxy_1 <- subset(autosome_5kb_schools, avg_dxy!="NaN" & no_snps>125)
 
-# Subset for each combination (currently tediously hard coded, might address later)
+# Subset for each combination
 autosome_5kb_schools_dxy_1_Bugoto_Kocoge <- subset(autosome_5kb_schools_dxy_1, pop1=="Bugoto" & pop2=="Kocoge")
 autosome_5kb_schools_dxy_1_Bwondha_Kocoge <- subset(autosome_5kb_schools_dxy_1, pop2=="Bwondha" & pop1=="Kocoge")
 autosome_5kb_schools_dxy_1_Musubi_Kocoge <- subset(autosome_5kb_schools_dxy_1, pop1=="Musubi" & pop2=="Kocoge")
