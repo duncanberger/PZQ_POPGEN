@@ -1,4 +1,4 @@
-# Supplementary figure 10: One dimensional site frequency spectra for each miracidial subpopulation
+# Supplementary Figure 10: Genome-wide allele frequency patterns
 ## Load and group SFS data
 ```{r}
 sfs <-read.csv("sfs.csv", header=TRUE)
@@ -32,7 +32,7 @@ d1sfs <- ggplot(data=subset(sfs, Bin>1)) +
 ```
 ## Load and group 1D-SFS residuals
 ```{r}
-sfs_res <-read.csv("sfs_res.list", header=FALSE)
+sfs_res <-read.csv("sfs_res.csv", header=FALSE)
 df.summary_res <- sfs_res %>%
   group_by(V2, V3) %>%
   subset(V2>1) %>%
