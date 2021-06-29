@@ -72,7 +72,7 @@ pc3_pc4 <- ggplot(eigenvec_merged, aes((PC3),(PC4))) +
   scale_y_continuous(limits=c(-0.2000000001,0.800000001), expand=c(0,0)) +
   theme_bw() + PCA_theme
 ```
-## Figure 2B: Mid-point rooted neighbour-joining tree <a name="figure2b"></a>
+## Figure 2C: Mid-point rooted neighbour-joining tree <a name="figure2b"></a>
 ```{r}
 # Load distance matrix
 mdist <- as.matrix(read.table("autosomes.mdist", sep="\t", header=TRUE, row.names=1))
@@ -85,7 +85,7 @@ tree <- ggtree(nj_tree, layout="circular", aes(color=Site)) %<+% key +
   scale_color_manual(values=pca_palette, na.value='grey50')+
   geom_treescale(x=0.02, color='grey50', offset = 0.8,width = 0.025)
 ```
-## Figure 2C: Autosomal nucleotide diversity values <a name="figure2c"></a>
+## Figure 2D: Autosomal nucleotide diversity values <a name="figure2c"></a>
 ```{r}
 # Load nucleotide diversity results
 pi_5kb_schools <- read.table("all.pi.pixy.schools.txt", header=TRUE)
@@ -110,7 +110,7 @@ pi_all_ps <- ggplot(data=pi_5kb_schools_subset, aes(x=pop, y=log10(avg_pi), fill
   PCA_theme + theme(legend.position = "none") +
   theme(legend.text = element_text(size=6.5, face = "bold"))
 ```
-## Figure 2D: Pairwise comparisons of absolute (d<sub>XY</sub>) and relative (F<sub>ST</sub>) differentiation <a name="figure2d"></a>
+## Figure 2E: Pairwise comparisons of absolute (d<sub>XY</sub>) and relative (F<sub>ST</sub>) differentiation <a name="figure2d"></a>
 ### Calculate F<sub>ST</sub> estimates between each population
 ```{r}
 # Load FST scores for all pairwise comparisons between schools
@@ -172,7 +172,7 @@ quantile(bstrap_medians,c(0.05,0.95))
 
 # At present these values need to be manually added to figure, as ggplot/cowplot don't combine well with tables. 
 ```
-## Figure 2E: Admixture <a name="figure2e"></a>
+## Figure 2F: Admixture <a name="figure2e"></a>
 ```{r}
 # Set theme 
 Admixture_theme <- theme(panel.grid=element_blank(), 
