@@ -15,7 +15,7 @@ pca_palette <- c("#56B4E9", "#009e73","#E69f00","#CC79A7")
 pid_2 <- pid %>% select('patient_ID','School','mean_post.treatment_posterior_egg_reduction_rate','pre.treatment_miracidia_sequenced_passed_qc','post.treatment_miracidia_sequenced_passed_qc')
 
 # Convert table to ggplot friendly format
-pid_2_melt <- melt(pid_2,id.vars = c("patient_ID","mean_post.treatment_posterior_egg_reduction_rate","School"), measure.vars=c("pre.treatment_miracidia_sequenced_passed_qc","post.treatment_miracidia_sequenced_passed_qc"))
+pid_2_melt <- melt(pid_2,id.vars = c("child_ID","mean_post.treatment_posterior_egg_reduction_rate","School"), measure.vars=c("pre.treatment_miracidia_sequenced_passed_qc","post.treatment_miracidia_sequenced_passed_qc"))
 
 # Convert pre- and post-treatment numbers to numerical format
 pid_2_melt$variable <- ifelse(pid_2_melt$variable == "pre.treatment_miracidia_sequenced_passed_qc", "0", "27")
@@ -28,9 +28,9 @@ pid_2_melt$Days_jit <- jitter(as.numeric(pid_2_melt$variable), factor=0.5)
 pid_2_melt$School = factor(pid_2_melt$School, levels=c('Bwondha','Bugoto','Musubi','Kocoge'))
 
 # Plot
-ggplot(data=subset(pid_2_melt, value!=0), aes(x=Days_jit, group=patient_ID, y=value)) + 
+ggplot(data=subset(pid_2_melt, value!=0), aes(x=Days_jit, group=child_ID, y=value)) + 
   facet_grid(.~School,scales="free_y", space = "free_y") +
-  geom_line(aes(group=patient_ID), alpha=0.6) +
+  geom_line(aes(group=child_ID), alpha=0.6) +
   geom_point(aes(fill=School), alpha=0.6,color="black",pch=21, size=4) +
   scale_x_continuous(breaks=c(0,27)) +
   scale_y_continuous(breaks=c(0,1,2,3,4,5,6,7,8,9), limits=c(0,9), expand=c(0,0))+
