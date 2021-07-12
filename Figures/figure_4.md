@@ -283,5 +283,5 @@ PI_TM <- ggplot(subset(PI_merged,N_VARIANTS.x>=20), aes(x=ID, y=log10(PI.x/PI.y)
 ```
 ## Merge figures <a name="merge"></a>
 ```{r}
-plot_grid(MAYUGE_IHS,TORORO_IHS,XPEHH,FST,PI_TM,axis,nrow=5, align = "v", rel_heights = c(1,1,1,1,1),labels=c("A","B","C","D","E"),label_y = 1.0)
+plot_grid(MAYUGE_IHS,TORORO_IHS,XPEHH,FST,PI_TM,nrow=5, align = "v", rel_heights = c(1,1,1,1,1),labels=c("A","B","C","D","E"),label_y = 1.0)
 ```
